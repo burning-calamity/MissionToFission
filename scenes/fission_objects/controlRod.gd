@@ -56,11 +56,6 @@ func _draw() -> void:
 func initialize(pos_to_set:Vector2) -> void:
 	position = Vector2(pos_to_set)
 	
-# delete neutron on enter
-func _on_body_entered(body: Node2D) -> void:
-	# Have neutron shrink as dying to indicate absorption
-	body.kill_self_deflate()
-
 
 func _process(delta: float) -> void:
 	if (even and move_even) or (not even and not move_even):
@@ -117,3 +112,7 @@ static func update_control_rods() -> void:
 	for ctrlrod: CanvasItem in _registered_nodes:
 		ctrlrod.position.y = clampf(ctrlrod.position.y, min_height, max_height)
 		ctrlrod.queue_redraw()
+
+
+func _on_area_entered(area: Area2D) -> void:
+	area.kill_self_deflate()

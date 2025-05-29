@@ -4,6 +4,7 @@ var neutrol_collide_slot: int = 1
 var atoms_collide_slot: int = 2
 var controlRods_collide_slot: int = 3
 var moderator_neutron_slot: int = 4
+var water_slot: int = 20 # TODO impliment this with code (should be set by neutron.gd and water.gd)
 
 # reset keep and keep check of default settings
 func reset_game_var() -> void:

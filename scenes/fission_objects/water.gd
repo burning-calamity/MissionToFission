@@ -42,9 +42,12 @@ func _process(_delta:float) -> void:
 	self.temp = clampf(self.temp - (self.cool_of_speed*_delta), 0, 100000000)
 	# consider only redraw on temot change 
 	queue_redraw()
+	
+	if self.temp > 0:
+		linear_velocity += Vector2(self.temp, 0)
 
 
-func _on_body_entered(body: Node2D) -> void:
+func on_entered_area(body: Node2D) -> void:
 	if body is Neutron:
 		self.temp += 5
 		if self.temp < 100:
@@ -53,7 +56,7 @@ func _on_body_entered(body: Node2D) -> void:
 			# let water moderate
 			if Neutron.enable_moderation and body.is_fast:
 				body.current_speed *= 0.95
-				body.linear_velocity = body.linear_velocity.normalized() * body.current_speed
+				body.current_velocity = body.current_velocity.normalized() * body.current_speed
 				# stop collidng width moderator:
 				if body.current_speed < 100:
 					body.is_fast = false

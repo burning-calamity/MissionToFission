@@ -45,7 +45,7 @@ func get_random_decay_time() -> float:
 
 func _ready() -> void:
 	neutron_scene = load("res://scenes/fission_objects/neutron.tscn")
-	self.connect("body_entered", on_body_entered)
+
 	
 	# set collsion size
 	$CollisionShape2D.shape.radius = self.radius
@@ -86,21 +86,6 @@ func initialize(pos_to_set:Vector2, encriched:bool = true, keep_enrich_percent: 
 func _draw() -> void:
 	draw_circle(Vector2(0, 0), self.radius, current_color)
 
-
-func on_body_entered(body: Node) -> void:
-	if body is Neutron:
-		if is_enriched == true and not body.is_fast:
-			decay()
-			emit_neutrons(self.number_neutrons_emitted)
-			body.kill_self_deflate()
-			
-		elif self.is_xenon and Atom.enable_xenon:
-			self.is_xenon = false 
-			self.is_enriched = false
-			self.has_finsihed_faded = false
-			self.color_to_draw = color_decayed
-			queue_redraw()
-			body.kill_self_deflate()
 
 func _physics_process(delta: float) -> void:
 	# color in atom when changing state or born
@@ -204,3 +189,19 @@ func _on_timer_spontenius_neutron_emission_timeout() -> void:
 		parent.call_deferred("add_child", new_neutron)
 	else:
 		$Timer_spontenius_neutron_emission.stop()
+
+
+func _on_area_entered(area: Area2D) -> void:
+	if area is Neutron:
+		if is_enriched == true and not area.is_fast:
+			decay()
+			emit_neutrons(self.number_neutrons_emitted)
+			area.kill_self_deflate()
+			
+		elif self.is_xenon and Atom.enable_xenon:
+			self.is_xenon = false 
+			self.is_enriched = false
+			self.has_finsihed_faded = false
+			self.color_to_draw = color_decayed
+			queue_redraw()
+			area.kill_self_deflate()
