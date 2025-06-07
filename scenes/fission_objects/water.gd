@@ -17,7 +17,7 @@ static var enable_movement = false
 func _ready() -> void:
 	# set collisohape to set varables
 	var rectangle_shape:RectangleShape2D =  $CollisionShape2D.shape as RectangleShape2D
-	rectangle_shape.extents = Vector2(self.width/2., self.height/2.) 
+	rectangle_shape.extents = Vector2(self.width/2. - 1, self.height/2. -1) 
 	
 	# enable collison check w neutrons
 	set_collision_mask_value(globals.neutrol_collide_slot, true)
@@ -45,6 +45,12 @@ func _process(_delta:float) -> void:
 	
 	if self.temp > 0:
 		linear_velocity += Vector2(self.temp, 0)
+		
+	if self.position.x > 2050: 
+		set_collision_mask_value(18, true)
+	else:
+		set_collision_mask_value(18, false)
+		
 
 
 func on_entered_area(body: Node2D) -> void:

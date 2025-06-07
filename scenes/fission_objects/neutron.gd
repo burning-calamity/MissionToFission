@@ -16,7 +16,7 @@ static var enable_moderation:bool = false
 
 func _ready() -> void:
 	# set collsion size
-	$CollisionShape2D.shape.radius = self.radius
+	# $CollisionShape2D.shape.radius = self.radius
 	# sound effect geiger
 	$AudioStreamPlayer2D.play()
 	

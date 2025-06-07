@@ -48,7 +48,7 @@ func _ready() -> void:
 
 	
 	# set collsion size
-	$CollisionShape2D.shape.radius = self.radius
+	# $CollisionShape2D.shape.radius = self.radius
 	
 	if self.is_enriched:
 		current_color = color_enriched

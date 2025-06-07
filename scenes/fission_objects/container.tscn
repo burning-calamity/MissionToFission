@@ -3,7 +3,6 @@
 [ext_resource type="Script" uid="uid://2twyxh6psq8m" path="res://scenes/fission_objects/container.gd" id="1_skjks"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_skjks"]
-size = Vector2(1000, 20)
 
 [node name="Container" type="Node2D"]
 script = ExtResource("1_skjks")

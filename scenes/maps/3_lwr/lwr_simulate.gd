@@ -30,6 +30,21 @@ func _ready() -> void:
 	
 func build_countainer():
 	# build container 
+	
+	# sides
 	var new_container:Node = wall_scene.instantiate()
-	new_container.initialize(Vector2(0,0), 100, 100, 90) 
+	new_container.set_stats(Vector2(0, 480 - 10), 450, 10, 90) 
 	add_child(new_container)
+	
+	# new_container = wall_scene.instantiate()
+	# new_container.set_stats(Vector2(1850, 480), 450, 10, -90) 
+	# add_child(new_container)
+	
+	new_container = wall_scene.instantiate()
+	new_container.set_stats(Vector2(1850/2, 15), 1850/2, 10, 180) 
+	add_child(new_container)
+	
+	new_container = wall_scene.instantiate()
+	new_container.set_stats(Vector2(1850/2, 450*2 + 20), 1850/2, 10, 0) 
+	add_child(new_container)
+	

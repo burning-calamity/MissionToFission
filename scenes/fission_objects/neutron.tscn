@@ -4,6 +4,7 @@
 [ext_resource type="AudioStream" uid="uid://cdxujixqqccnt" path="res://assets/sounds/geig_short.mp3" id="2_f1fve"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_d6xvb"]
+radius = 5.0
 
 [node name="Neutron" type="Area2D"]
 z_index = 1

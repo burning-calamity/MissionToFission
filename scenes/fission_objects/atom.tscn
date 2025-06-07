@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://bib7xophxoheh" path="res://scenes/fission_objects/atom.gd" id="1_1umod"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_n34k7"]
-radius = 0.2
+radius = 20.0
 
 [node name="Atom" type="Area2D" groups=["atoms"]]
 collision_layer = 0
