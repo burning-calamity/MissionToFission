@@ -3,8 +3,8 @@
 [ext_resource type="Script" uid="uid://dsao1ad1linuu" path="res://scenes/fission_objects/water.gd" id="1_1rrdm"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_d4k7s"]
-friction = 0.1
-bounce = 0.93
+friction = 0.0
+bounce = 130.45
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_d4k7s"]
 

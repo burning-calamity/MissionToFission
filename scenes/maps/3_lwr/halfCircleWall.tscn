@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://dftde5nox74of"]
+
+[ext_resource type="Script" uid="uid://bjne3lkvh3ynp" path="res://scenes/maps/3_lwr/half_circle_wall.gd" id="1_x5mgt"]
+
+[node name="HalfCircleWall" type="Node2D"]
+light_mask = 458752
+visibility_layer = 458752
+script = ExtResource("1_x5mgt")
