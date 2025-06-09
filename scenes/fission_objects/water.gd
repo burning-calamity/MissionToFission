@@ -16,15 +16,19 @@ static var enable_movement = false
 
 func _ready() -> void:
 	# set collisohape to set varables
-	var rectangle_shape:RectangleShape2D =  $CollisionShape2D.shape as RectangleShape2D
-	rectangle_shape.extents = Vector2(self.width/2. - 1, self.height/2. -1) 
-	
+	# var rectangle_shape:RectangleShape2D =  $CollisionShape2D.shape as RectangleShape2D
+	# rectangle_shape.extents = Vector2(self.width/2. - 1, self.height/2. -1) 
+	var rectangle_shape:CircleShape2D =  $CollisionShape2D.shape as CircleShape2D
+	rectangle_shape.radius = 24
 	# enable collison check w neutrons
 	set_collision_mask_value(globals.neutrol_collide_slot, true)
 	set_collision_mask_value(globals.moderator_neutron_slot, true)
 	
-	contact_monitor = true
-	max_contacts_reported = 1
+	#contact_monitor = true
+	#max_contacts_reported = 1
+	
+	# collide with cylinder
+	set_collision_mask_value(18, true)
 	
 
 func _draw() -> void:
@@ -44,13 +48,7 @@ func _process(_delta:float) -> void:
 	queue_redraw()
 	
 	if self.temp > 0:
-		linear_velocity += Vector2(self.temp, 0)
-		
-	if self.position.x > 2050: 
-		set_collision_mask_value(18, true)
-	else:
-		set_collision_mask_value(18, false)
-		
+		linear_velocity += Vector2(0, - self.temp/1000)
 
 
 func on_entered_area(body: Node2D) -> void:

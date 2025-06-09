@@ -7,7 +7,6 @@ func _ready() -> void:
 
 
 func _draw() -> void:
-	print("draw_call: ", size_x)
 	draw_rect(Rect2(
 		- size_x,
 		- size_y,

@@ -134,7 +134,6 @@ disable_plugin_dialogues=true
 
 [physics]
 
-2d/physics_engine="GodotPhysics2D"
 2d/default_gravity=0.0
 
 [rendering]

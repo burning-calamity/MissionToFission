@@ -1,10 +1,16 @@
-[gd_scene load_steps=3 format=3 uid="uid://dmm7dwh1dnc6r"]
+[gd_scene load_steps=7 format=3 uid="uid://dmm7dwh1dnc6r"]
 
 [ext_resource type="Script" uid="uid://dag04kevwrspp" path="res://scenes/maps/3_lwr/lwr_simulate.gd" id="1_0dugb"]
+[ext_resource type="PackedScene" uid="uid://bojtj14bu4qvb" path="res://scenes/maps/3_lwr/pump.tscn" id="2_vsx07"]
+[ext_resource type="Texture2D" uid="uid://bba0v2o4cel2h" path="res://assets/turbine.png" id="3_1iqry"]
+[ext_resource type="Texture2D" uid="uid://vvf0rygqu2cs" path="res://assets/water_pump.png" id="4_g7e3x"]
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_0dugb"]
-custom_solver_bias = 1.0
-radius = 460.0
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_vsx07"]
+friction = 0.0
+bounce = 1.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_vsx07"]
+size = Vector2(516, 415)
 
 [node name="LwrSimulate" type="Node2D"]
 script = ExtResource("1_0dugb")
@@ -12,11 +18,34 @@ script = ExtResource("1_0dugb")
 [node name="StaticBody2D" type="StaticBody2D" parent="."]
 collision_layer = 131072
 collision_mask = 131072
+physics_material_override = SubResource("PhysicsMaterial_vsx07")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
 light_mask = 131072
 visibility_layer = 131072
-position = Vector2(2666, 544)
-shape = SubResource("CircleShape2D_0dugb")
-one_way_collision = true
+position = Vector2(2100, 450)
+rotation = 1.5708
+shape = SubResource("RectangleShape2D_vsx07")
 debug_color = Color(0.747907, 0, 0.356041, 0.42)
+
+[node name="Pump" parent="." instance=ExtResource("2_vsx07")]
+position = Vector2(1115, 69)
+scale = Vector2(20.895, 1.3)
+
+[node name="Pump2" parent="." instance=ExtResource("2_vsx07")]
+position = Vector2(2428, 121)
+rotation = 1.5708
+scale = Vector2(2, 3.23)
+
+[node name="Pump3" parent="." instance=ExtResource("2_vsx07")]
+position = Vector2(2406, 887)
+rotation = 3.14159
+scale = Vector2(2.02, 3.93)
+
+[node name="Turbine" type="Sprite2D" parent="."]
+position = Vector2(2398, 471)
+texture = ExtResource("3_1iqry")
+
+[node name="WaterPump" type="Sprite2D" parent="."]
+position = Vector2(2614, 115)
+texture = ExtResource("4_g7e3x")
