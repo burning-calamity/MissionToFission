@@ -4,7 +4,7 @@
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_d4k7s"]
 friction = 0.0
-bounce = 130.45
+bounce = 1.0
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_d4k7s"]
 

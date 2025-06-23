@@ -48,9 +48,9 @@ func build_countainer():
 	new_container.set_stats(Vector2(0, height + margin), height , 10, 90) 
 	add_child(new_container)
 	
-	# new_container = wall_scene.instantiate()
-	# new_container.set_stats(Vector2(width, height + margin), height , 10, -90) 
-	# add_child(new_container)
+	new_container = wall_scene.instantiate()
+	new_container.set_stats(Vector2(width, height + margin -5), 210 , 10, -90) 
+	add_child(new_container)
 	
 	new_container = wall_scene.instantiate()
 	new_container.set_stats(Vector2(width/2, 10), width/2 + 10, 10, 180) 
@@ -60,16 +60,6 @@ func build_countainer():
 	new_container.set_stats(Vector2(width/2, 20 + 2*height), width/2 + 10, 10, 0) 
 	add_child(new_container)
 	
-func _draw():
-	# draw collision box 
-	var rect = Rect2(Vector2(1900, 200), Vector2(400, 600))
-
-	# Draw filled white rectangle
-	draw_rect(rect, Color.WHITE, true)
-
-	# Draw black border (outline)
-	draw_rect(rect, Color.BLACK, false, 20.0)  # 2.0 is border thickness
-
 
 func _on_area_2_dheatexhanger_body_entered(body: Node2D) -> void:
 	if body is RigidBody2D and body is Water:
@@ -78,5 +68,4 @@ func _on_area_2_dheatexhanger_body_entered(body: Node2D) -> void:
 		
 func _process(delta: float) -> void:
 	$Turbine.rotation_degrees =  fmod($Turbine.rotation_degrees + turbine_speed * delta, 360.0) 
-	
 	turbine_speed = clamp(turbine_speed-0.5, 0, 100)

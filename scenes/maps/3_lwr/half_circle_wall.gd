@@ -5,6 +5,7 @@ extends Node2D
 @export var arc_degrees: float = 180.0  # Half circle
 @export var wall_thickness: float = 100.0
 @export var wall_length: float = 15.0
+@export var skip_first_and_last: bool = false
 
 func _ready():
 	create_half_circle_wall()
@@ -14,6 +15,9 @@ func create_half_circle_wall():
 	var start_angle = deg_to_rad(90.0 - arc_degrees / 2.0)
 
 	for i in range(segments + 1):
+		if skip_first_and_last:
+			if i == 0 or i == segments:
+				continue
 		var angle = start_angle + i * angle_step
 		var pos = Vector2(cos(angle), sin(angle)) * radius
 

@@ -1,17 +1,10 @@
-[gd_scene load_steps=9 format=3 uid="uid://dmm7dwh1dnc6r"]
+[gd_scene load_steps=7 format=3 uid="uid://dmm7dwh1dnc6r"]
 
 [ext_resource type="Script" uid="uid://dag04kevwrspp" path="res://scenes/maps/3_lwr/lwr_simulate.gd" id="1_0dugb"]
 [ext_resource type="PackedScene" uid="uid://dftde5nox74of" path="res://scenes/maps/3_lwr/halfCircleWall.tscn" id="2_g7e3x"]
 [ext_resource type="PackedScene" uid="uid://bojtj14bu4qvb" path="res://scenes/maps/3_lwr/pump.tscn" id="2_vsx07"]
 [ext_resource type="Texture2D" uid="uid://bba0v2o4cel2h" path="res://assets/turbine.png" id="3_1iqry"]
 [ext_resource type="Texture2D" uid="uid://vvf0rygqu2cs" path="res://assets/water_pump.png" id="4_g7e3x"]
-
-[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_vsx07"]
-friction = 0.0
-bounce = 1.0
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_vsx07"]
-size = Vector2(615, 415)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_g7e3x"]
 size = Vector2(374, 127)
@@ -24,18 +17,12 @@ position = Vector2(2200, 475)
 rotation = -1.5708
 radius = 465.0
 
-[node name="StaticBody2D" type="StaticBody2D" parent="."]
-collision_layer = 131072
-collision_mask = 131072
-physics_material_override = SubResource("PhysicsMaterial_vsx07")
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
-light_mask = 131072
-visibility_layer = 131072
-position = Vector2(2100, 500)
-rotation = 1.5708
-shape = SubResource("RectangleShape2D_vsx07")
-debug_color = Color(0.747907, 0, 0.356041, 0.42)
+[node name="HalfCircleWalInner" parent="." instance=ExtResource("2_g7e3x")]
+position = Vector2(2200, 475)
+rotation = -1.5708
+radius = 200.0
+wall_thickness = 40.0
+skip_first_and_last = true
 
 [node name="Pump" parent="." instance=ExtResource("2_vsx07")]
 position = Vector2(1115, 119)
