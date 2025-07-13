@@ -115,4 +115,5 @@ static func update_control_rods() -> void:
 
 
 func _on_area_entered(area: Area2D) -> void:
-	area.kill_self_deflate()
+	if area is Neutron:
+		area.kill_self_deflate()

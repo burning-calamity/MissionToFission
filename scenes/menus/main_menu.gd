@@ -23,7 +23,7 @@ func _ready() -> void:
 		button.pressed.connect(_on_404_pressed)
 		
 	# instantly load new map for debug
-	animate_out("res://scenes/maps/3_lwr/lwr_simulate.tscn", "res://scenes/game_core/game_runner.tscn")
+	# animate_out("res://scenes/maps/3_lwr/lwr_simulate.tscn", "res://scenes/game_core/game_runner.tscn")
 
 func configure_settings() -> void:
 	globals.reset_game_var()

@@ -132,7 +132,7 @@ func DialogicSignal(argument:String) -> void:
 		# globals.play(preload("res://assets/sounds/long_sound.wav"))
 		
 # neutron collide with urnium atom center
-func _on_area_2d_body_entered(_body: Node2D) -> void:
+func _on_area_2d_area_entered(_area: Area2D) -> void:
 	if tut_state == "play_neutron":
 		# disable more neutrons checks 
 		$Area2D.set_collision_mask_value(globals.neutrol_collide_slot, false)

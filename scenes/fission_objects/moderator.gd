@@ -32,18 +32,19 @@ func _draw() -> void:
 func initialize(pos_to_set:Vector2) -> void:
 	position = Vector2(pos_to_set[0], pos_to_set[1])
 	
-func _on_body_entered(body: Node2D) -> void:
-	body.linear_velocity[0] = -body.linear_velocity[0]
-	if body.is_fast:
-		body.is_fast = false
-		body.current_speed = body.thermal_speed
-		body.linear_velocity = body.linear_velocity.normalized() * body.current_speed
-		# stop collidng width moderator:
-		body.set_collision_layer_value(globals.moderator_neutron_slot, false)
-		# start colliding width atoms:
-		body.set_collision_layer_value(globals.neutrol_collide_slot, true)
-		body.queue_redraw()
-		
+func _on_area_entered(area: Area2D) -> void:
+	if area is Neutron:
+		area.current_velocity.x = -area.current_velocity.x
+		if area.is_fast:
+			area.is_fast = false
+			area.current_speed = area.thermal_speed
+			area.current_velocity = area.current_velocity.normalized() * area.current_speed
+			# stop collidng width moderator:
+			area.set_collision_layer_value(globals.moderator_neutron_slot, false)
+			# start colliding width atoms:
+			area.set_collision_layer_value(globals.neutrol_collide_slot, true)
+			area.queue_redraw()
+
 		
 static func update_mods() -> void:
 	rod_height = GameRunner.y_row_build * GameRunner.margin 

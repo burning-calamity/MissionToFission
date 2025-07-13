@@ -11,8 +11,8 @@ var temp: float = 0.
 
 static var water_absorb_chance: float = 0.05
 static var cool_of_speed:float = 15
-static var enable_movement = false
-static var moderation_strength = 0.95
+static var enable_movement:bool = false
+static var moderation_strength:float = 0.95
 
 
 func _ready() -> void:
@@ -20,7 +20,7 @@ func _ready() -> void:
 	# var rectangle_shape:RectangleShape2D =  $CollisionShape2D.shape as RectangleShape2D
 	# rectangle_shape.extents = Vector2(self.width/2. - 1, self.height/2. -1) 
 	var rectangle_shape:CircleShape2D =  $CollisionShape2D.shape as CircleShape2D
-	rectangle_shape.radius = 15
+	rectangle_shape.radius = 20
 	# enable collison check w neutrons
 	set_collision_mask_value(globals.neutrol_collide_slot, true)
 	set_collision_mask_value(globals.moderator_neutron_slot, true)
@@ -48,8 +48,8 @@ func _process(_delta:float) -> void:
 	# consider only redraw on temot change 
 	queue_redraw()
 	
-	if self.temp > 0:
-		linear_velocity += Vector2(0, - self.temp/1000)
+	# if self.temp > 0:
+	# 	linear_velocity += Vector2(0, - self.temp/1000)
 
 
 func on_entered_area(body: Node2D) -> void:

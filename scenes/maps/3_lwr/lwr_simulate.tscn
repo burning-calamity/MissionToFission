@@ -21,16 +21,10 @@ radius = 465.0
 position = Vector2(2200, 475)
 rotation = -1.5708
 radius = 200.0
-wall_thickness = 40.0
 skip_first_and_last = true
 
-[node name="Pump" parent="." instance=ExtResource("2_vsx07")]
-position = Vector2(1115, 119)
-scale = Vector2(20.895, 2.125)
-pump_strength = 0.01
-
 [node name="Turbine" type="Sprite2D" parent="."]
-position = Vector2(2461, 471)
+position = Vector2(2529, 471)
 texture = ExtResource("3_1iqry")
 
 [node name="WaterPump" type="Sprite2D" parent="."]
@@ -46,10 +40,8 @@ offset_bottom = 1303.0
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 text = "This is a beta.
 Here needs to be:
-- Control for heat ehxanger
 - Control for turbine
 - Control for water pump
-- More stable water flow
 Share your ideas!
 "
 
@@ -61,16 +53,27 @@ collision_mask = 458752
 position = Vector2(2508, 459)
 shape = SubResource("RectangleShape2D_g7e3x")
 
+[node name="Pump" parent="." instance=ExtResource("2_vsx07")]
+position = Vector2(1115, 119)
+scale = Vector2(20.895, 2.125)
+pump_strength = 5.0
+
 [node name="Pump2" parent="." instance=ExtResource("2_vsx07")]
 position = Vector2(2297, 829)
 rotation = 2.63545
 scale = Vector2(3, 3)
-pump_strength = 0.1
+pump_strength = 30.0
 
 [node name="Pump3" parent="." instance=ExtResource("2_vsx07")]
 position = Vector2(2473, 278)
 rotation = 1.5708
 scale = Vector2(5.2, 2.125)
-pump_strength = 0.1
+pump_strength = 6.0
+
+[node name="Pump4" parent="." instance=ExtResource("2_vsx07")]
+position = Vector2(269, 835)
+rotation = -1.57079
+scale = Vector2(11.895, 4.085)
+pump_strength = 5.0
 
 [connection signal="body_entered" from="Area2D-heat-exhanger" to="." method="_on_area_2_dheatexhanger_body_entered"]

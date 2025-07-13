@@ -28,14 +28,12 @@ func _ready() -> void:
 	var cam = get_parent().get_node("Camera2D")
 	cam.zoom.x = 0.7
 	cam.zoom.y = 0.7
-
-
-
+	
 	
 	get_parent().build_grid_and_center(x_grid_range, y_grid_range, true, true, false, true, 3, false, true)
-
-	build_countainer()
 	
+	build_countainer()
+	# cam.position.y = - 10000
 	
 	
 func build_countainer():

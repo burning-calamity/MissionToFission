@@ -9,7 +9,7 @@ var fast_speed:float = 200
 var is_fast:bool = false
 var is_dead:bool = false # parameter to fade out
 var just_born:bool = true # parameter to fade in 
-var current_velocity = Vector2()
+var current_velocity:Vector2 = Vector2()
 
 
 static var enable_moderation:bool = false
