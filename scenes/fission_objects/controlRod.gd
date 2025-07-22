@@ -20,6 +20,9 @@ static var _registered_nodes: Array = []
 var rectangle_shape:Shape2D =  null
 
 func _ready() -> void:
+	# Enable input detection for mouse clicks
+	input_pickable = true
+	
 	# set collisohape to set varables
 	rectangle_shape = $CollisionShape2D.shape as RectangleShape2D
 	rectangle_shape.extents = Vector2(self.width/2., self.rod_height/2.) 
@@ -83,19 +86,19 @@ func get_input() -> void:
 	if not enable_auomatic:
 		direction = 0
 		
-	if Input.is_action_just_released("s") or Input.is_action_just_released("ui_up") \
-		or Input.is_action_just_released("w") or Input.is_action_just_released("ui_down"):
+	if Input.is_action_just_released("s") or Input.is_action_just_released("ui_down") \
+		or Input.is_action_just_released("w") or Input.is_action_just_released("ui_up"):
 			$looper.stop()
 			$sound_rod_end.play()
 	
-	if Input.is_action_just_pressed("s") or Input.is_action_just_pressed("ui_up") \
-		or Input.is_action_just_pressed("w") or Input.is_action_just_pressed("ui_down"):
+	if Input.is_action_just_pressed("s") or Input.is_action_just_pressed("ui_down") \
+		or Input.is_action_just_pressed("w") or Input.is_action_just_pressed("ui_up"):
 		$looper.play()
 		
-	if Input.is_action_pressed("s") or Input.is_action_pressed("ui_up"):
+	if Input.is_action_pressed("s") or Input.is_action_pressed("ui_down"):
 		enable_auomatic = false
 		direction = 1
-	if Input.is_action_pressed("w") or Input.is_action_pressed("ui_down"):
+	if Input.is_action_pressed("w") or Input.is_action_pressed("ui_up"):
 		enable_auomatic = false
 		direction = -1
 
@@ -117,3 +120,13 @@ static func update_control_rods() -> void:
 func _on_area_entered(area: Area2D) -> void:
 	if area is Neutron:
 		area.kill_self_deflate()
+
+
+func _on_input_event(viewport: Node, event: InputEvent, shape_idx: int) -> void:
+	if event is InputEventMouseButton:
+		var mouse_event = event as InputEventMouseButton
+		if mouse_event.button_index == MOUSE_BUTTON_LEFT:
+			if mouse_event.pressed:
+				print("mouse pressed")
+
+			get_viewport().set_input_as_handled()
