@@ -1,4 +1,4 @@
-extends RigidBody2D
+extends Area2D
 class_name Neutron
 
 @export var radius: float = 0. # used in fade in, size will be 5 
@@ -9,14 +9,14 @@ var fast_speed:float = 200
 var is_fast:bool = false
 var is_dead:bool = false # parameter to fade out
 var just_born:bool = true # parameter to fade in 
+var current_velocity:Vector2 = Vector2()
 
 
 static var enable_moderation:bool = false
 
 func _ready() -> void:
 	# set collsion size
-	$CollisionShape2D.shape.radius = self.radius
-
+	# $CollisionShape2D.shape.radius = self.radius
 	# sound effect geiger
 	$AudioStreamPlayer2D.play()
 	
@@ -52,9 +52,10 @@ func initialize(pos_to_set:Vector2, movement_direction:Vector2 = get_random_dire
 
 	if enable_moderation:
 		self.current_speed = self.fast_speed
-	linear_velocity = self.current_speed * movement_direction
+	current_velocity = self.current_speed * movement_direction
 
 func _physics_process(delta: float) -> void:
+	position += current_velocity * delta
 	# If the neutron is dead, shrink the raidius every frame
 	if is_dead:
 		self.radius -= delta * 40
@@ -64,7 +65,7 @@ func _physics_process(delta: float) -> void:
 			
 	# if neutron just born, fade in the radius		
 	elif just_born:
-		self.radius += delta * 40
+		self.radius += delta * 80
 		queue_redraw()
 		if self.radius >= 5.:
 			self.radius = 5.
@@ -78,7 +79,11 @@ func kill_self() -> void:
 func kill_self_deflate() -> void:
 	# Kills the neutron in a way to make it shrink before disappearing, indicating absorption
 	is_dead = true
-	linear_velocity = Vector2()
+	current_velocity = Vector2(0, 0)
 	
 func _on_visible_on_screen_notifier_2d_screen_exited() -> void:
 	kill_self()
+
+func _on_body_entered(body: Node2D) -> void:
+	if body is Water:
+		body.call("on_entered_area", self)  # optional: tell body something

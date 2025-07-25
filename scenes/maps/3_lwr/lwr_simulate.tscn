@@ -1,0 +1,79 @@
+[gd_scene load_steps=7 format=3 uid="uid://dmm7dwh1dnc6r"]
+
+[ext_resource type="Script" uid="uid://dag04kevwrspp" path="res://scenes/maps/3_lwr/lwr_simulate.gd" id="1_0dugb"]
+[ext_resource type="PackedScene" uid="uid://dftde5nox74of" path="res://scenes/maps/3_lwr/halfCircleWall.tscn" id="2_g7e3x"]
+[ext_resource type="PackedScene" uid="uid://bojtj14bu4qvb" path="res://scenes/maps/3_lwr/pump.tscn" id="2_vsx07"]
+[ext_resource type="Texture2D" uid="uid://bba0v2o4cel2h" path="res://assets/turbine.png" id="3_1iqry"]
+[ext_resource type="Texture2D" uid="uid://vvf0rygqu2cs" path="res://assets/water_pump.png" id="4_g7e3x"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_g7e3x"]
+size = Vector2(374, 127)
+
+[node name="LwrSimulate" type="Node2D"]
+script = ExtResource("1_0dugb")
+
+[node name="HalfCircleWall" parent="." instance=ExtResource("2_g7e3x")]
+position = Vector2(2200, 475)
+rotation = -1.5708
+radius = 465.0
+
+[node name="HalfCircleWalInner" parent="." instance=ExtResource("2_g7e3x")]
+position = Vector2(2200, 475)
+rotation = -1.5708
+radius = 200.0
+skip_first_and_last = true
+
+[node name="Turbine" type="Sprite2D" parent="."]
+position = Vector2(2529, 471)
+texture = ExtResource("3_1iqry")
+
+[node name="WaterPump" type="Sprite2D" parent="."]
+visible = false
+position = Vector2(2614, 115)
+texture = ExtResource("4_g7e3x")
+
+[node name="Label" type="Label" parent="."]
+offset_left = 493.0
+offset_top = 1124.0
+offset_right = 703.0
+offset_bottom = 1303.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "This is a beta.
+Here needs to be:
+- Control for turbine
+- Control for water pump
+Share your ideas!
+"
+
+[node name="Area2D-heat-exhanger" type="Area2D" parent="."]
+collision_layer = 458752
+collision_mask = 458752
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D-heat-exhanger"]
+position = Vector2(2508, 459)
+shape = SubResource("RectangleShape2D_g7e3x")
+
+[node name="Pump" parent="." instance=ExtResource("2_vsx07")]
+position = Vector2(1115, 119)
+scale = Vector2(20.895, 2.125)
+pump_strength = 5.0
+
+[node name="Pump2" parent="." instance=ExtResource("2_vsx07")]
+position = Vector2(2297, 829)
+rotation = 2.63545
+scale = Vector2(3, 3)
+pump_strength = 30.0
+
+[node name="Pump3" parent="." instance=ExtResource("2_vsx07")]
+position = Vector2(2473, 278)
+rotation = 1.5708
+scale = Vector2(5.2, 2.125)
+pump_strength = 6.0
+
+[node name="Pump4" parent="." instance=ExtResource("2_vsx07")]
+position = Vector2(269, 835)
+rotation = -1.57079
+scale = Vector2(11.895, 4.085)
+pump_strength = 5.0
+
+[connection signal="body_entered" from="Area2D-heat-exhanger" to="." method="_on_area_2_dheatexhanger_body_entered"]

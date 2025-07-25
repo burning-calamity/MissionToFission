@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://bib7xophxoheh" path="res://scenes/fission_objects/atom.gd" id="1_1umod"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_n34k7"]
-radius = 0.2
+radius = 20.0
 
 [node name="Atom" type="Area2D" groups=["atoms"]]
 collision_layer = 0
@@ -23,5 +23,6 @@ one_shot = true
 [node name="Timer_spontenius_neutron_emission" type="Timer" parent="."]
 process_mode = 1
 
+[connection signal="area_entered" from="." to="." method="_on_area_entered"]
 [connection signal="timeout" from="Timer_Xenon" to="." method="_on_timer_xenon_timeout"]
 [connection signal="timeout" from="Timer_spontenius_neutron_emission" to="." method="_on_timer_spontenius_neutron_emission_timeout"]

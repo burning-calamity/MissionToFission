@@ -90,6 +90,16 @@ func _ready() -> void:
 func _process(_delta: float) -> void:
 	game_logic(_delta)
 	update_hud()
+	
+	# pan camera 
+	# var direction = 0.0
+	# var cam = $Camera2D
+	# if Input.is_action_pressed("a"):
+	# 	direction -= 1.0
+	# if Input.is_action_pressed("d"):
+	# 	direction += 1.0
+
+	# cam.position.x += direction * 500 * _delta
 
 func game_logic(dt:float) -> void:
 	

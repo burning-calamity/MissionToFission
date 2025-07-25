@@ -1,0 +1,15 @@
+[gd_scene load_steps=3 format=3 uid="uid://bojtj14bu4qvb"]
+
+[ext_resource type="Script" uid="uid://bokjmnr4x127j" path="res://scenes/maps/3_lwr/pump.gd" id="1_3ve42"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_3ve42"]
+size = Vector2(100, 100)
+
+[node name="Pump" type="Area2D"]
+collision_layer = 458752
+collision_mask = 458752
+script = ExtResource("1_3ve42")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_3ve42")
+debug_color = Color(0, 0.576141, 0.390022, 0.42)

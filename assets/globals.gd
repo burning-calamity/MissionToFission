@@ -4,6 +4,7 @@ var neutrol_collide_slot: int = 1
 var atoms_collide_slot: int = 2
 var controlRods_collide_slot: int = 3
 var moderator_neutron_slot: int = 4
+var water_slot: int = 20 # TODO impliment this with code (should be set by neutron.gd and water.gd)
 
 # reset keep and keep check of default settings
 func reset_game_var() -> void:
@@ -43,7 +44,8 @@ func reset_game_var() -> void:
 	Moderator._registered_nodes = []
 
 	Water.water_absorb_chance = 0.05
-	Water.cool_of_speed = 10	
+	Water.cool_of_speed = 15
+	Water.moderation_strength = 0.95
 	
 	DebugMenu.style = DebugMenu.Style.HIDDEN
 	
