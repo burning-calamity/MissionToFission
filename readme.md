@@ -21,7 +21,6 @@ This game is made with Godot 4.4, and scripted width GDScript.
 
 ## Known Issues: 
 - Only runs on 1920*1080 screen
-- Game stops at 1000 neutrons
 
 ## Big Todo's:
 - Add "options" settings, for sound music and such.
