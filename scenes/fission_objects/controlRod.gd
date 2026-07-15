@@ -107,13 +107,20 @@ func _physics_process(_delta:float) -> void:
 	get_input()
 	
 static func update_control_rods() -> void:
+	var previous_min_height: float = min_height
+	var previous_max_height: float = max_height
 	rod_height = GameRunner.y_row_build * GameRunner.margin 
 	min_height = -rod_height/2 + GameRunner.margin/2
 	max_height = rod_height/2 + GameRunner.margin/2
 	
 	# que redraw
 	for ctrlrod: CanvasItem in _registered_nodes:
-		ctrlrod.position.y = clampf(ctrlrod.position.y, min_height, max_height)
+		if is_equal_approx(ctrlrod.position.y, previous_max_height):
+			ctrlrod.position.y = max_height
+		elif is_equal_approx(ctrlrod.position.y, previous_min_height):
+			ctrlrod.position.y = min_height
+		else:
+			ctrlrod.position.y = clampf(ctrlrod.position.y, min_height, max_height)
 		ctrlrod.queue_redraw()
 
 

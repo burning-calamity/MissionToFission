@@ -72,6 +72,20 @@ func setup_reactor_modes() -> void:
 		_on_game_mode_molten_salt_pressed,
 		_on_simulate_mode_molten_salt_pressed,
 	)
+	create_reactor_card(
+		"gas_cooled_reactor",
+		"Gas-Cooled Reactor",
+		_on_tutorial_gas_cooled_pressed,
+		_on_game_mode_gas_cooled_pressed,
+		_on_simulate_mode_gas_cooled_pressed,
+	)
+	create_reactor_card(
+		"thorium_reactor",
+		"Thorium Reactor",
+		_on_tutorial_thorium_pressed,
+		_on_game_mode_thorium_pressed,
+		_on_simulate_mode_thorium_pressed,
+	)
 
 
 func create_reactor_card(
@@ -331,3 +345,21 @@ func _on_game_mode_molten_salt_pressed() -> void:
 
 func _on_simulate_mode_molten_salt_pressed() -> void:
 	animate_out("res://scenes/maps/6_molten_salt/molten_salt_reactor.tscn", "res://scenes/game_core/game_runner.tscn")
+
+func _on_tutorial_gas_cooled_pressed() -> void:
+	animate_out("res://scenes/maps/7_gas_cooled/tutorial.tscn", "res://scenes/game_core/game_runner.tscn")
+
+func _on_game_mode_gas_cooled_pressed() -> void:
+	open_difficulty_selector("res://scenes/maps/7_gas_cooled/gas_cooled_reactor_game.tscn", "res://scenes/game_core/game_runner.tscn")
+
+func _on_simulate_mode_gas_cooled_pressed() -> void:
+	animate_out("res://scenes/maps/7_gas_cooled/gas_cooled_reactor.tscn", "res://scenes/game_core/game_runner.tscn")
+
+func _on_tutorial_thorium_pressed() -> void:
+	animate_out("res://scenes/maps/8_thorium/tutorial.tscn", "res://scenes/game_core/game_runner.tscn")
+
+func _on_game_mode_thorium_pressed() -> void:
+	open_difficulty_selector("res://scenes/maps/8_thorium/thorium_reactor_game.tscn", "res://scenes/game_core/game_runner.tscn")
+
+func _on_simulate_mode_thorium_pressed() -> void:
+	animate_out("res://scenes/maps/8_thorium/thorium_reactor.tscn", "res://scenes/game_core/game_runner.tscn")

@@ -13,6 +13,7 @@ var atom_scene:PackedScene = load("res://scenes/fission_objects/atom.tscn")
 var controlRod_scene:PackedScene = load("res://scenes/fission_objects/controlRod.tscn")
 var moderator_scene:PackedScene = load("res://scenes/fission_objects/moderator.tscn")
 var water_scene:PackedScene = load("res://scenes/fission_objects/water.tscn")
+var zoom_step: float = 0.1
 
 signal toggle_game_paused(is_paused: bool)
 
@@ -43,6 +44,71 @@ var game_paused: bool = false:
 		emit_signal("toggle_game_paused", game_paused)
 		
 		
+
+func create_zoom_controls() -> void:
+	if has_node("ZoomControls"):
+		return
+	var canvas := CanvasLayer.new()
+	canvas.name = "ZoomControls"
+	add_child(canvas)
+
+	var panel := PanelContainer.new()
+	panel.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
+	panel.offset_left = -185
+	panel.offset_top = -70
+	panel.offset_right = 185
+	panel.offset_bottom = -20
+	canvas.add_child(panel)
+
+	var row := HBoxContainer.new()
+	row.alignment = BoxContainer.ALIGNMENT_CENTER
+	row.add_theme_constant_override("separation", 12)
+	panel.add_child(row)
+
+	var zoom_out_button := Button.new()
+	zoom_out_button.text = "Zoom -"
+	zoom_out_button.pressed.connect(_on_zoom_out_pressed)
+	row.add_child(zoom_out_button)
+
+	var auto_zoom_button := Button.new()
+	auto_zoom_button.text = "Auto Zoom"
+	auto_zoom_button.pressed.connect(_on_auto_zoom_pressed)
+	row.add_child(auto_zoom_button)
+
+	var zoom_in_button := Button.new()
+	zoom_in_button.text = "Zoom +"
+	zoom_in_button.pressed.connect(_on_zoom_in_pressed)
+	row.add_child(zoom_in_button)
+
+func _on_zoom_out_pressed() -> void:
+	set_camera_zoom($Camera2D.zoom.x - zoom_step)
+
+func _on_zoom_in_pressed() -> void:
+	set_camera_zoom($Camera2D.zoom.x + zoom_step)
+
+func _on_auto_zoom_pressed() -> void:
+	auto_zoom_to_reactor()
+
+func set_camera_zoom(new_zoom: float) -> void:
+	var clamped_zoom: float = clampf(new_zoom, 0.25, 2.0)
+	$Camera2D.zoom = Vector2(clamped_zoom, clamped_zoom)
+
+func auto_zoom_to_reactor() -> void:
+	var atoms: Array[Node] = get_tree().get_nodes_in_group("atoms")
+	if atoms.is_empty():
+		return
+	var min_pos: Vector2 = atoms[0].global_position
+	var max_pos: Vector2 = atoms[0].global_position
+	for atom in atoms:
+		min_pos.x = minf(min_pos.x, atom.global_position.x)
+		min_pos.y = minf(min_pos.y, atom.global_position.y)
+		max_pos.x = maxf(max_pos.x, atom.global_position.x)
+		max_pos.y = maxf(max_pos.y, atom.global_position.y)
+	var reactor_size: Vector2 = max_pos - min_pos + Vector2(margin * 4, margin * 4)
+	var viewport_size: Vector2 = get_viewport().get_visible_rect().size
+	var target_zoom: float = minf(viewport_size.x / reactor_size.x, viewport_size.y / reactor_size.y)
+	set_camera_zoom(target_zoom)
+
 func _unhandled_input(event:InputEvent) -> void:
 	# close program on esc button
 	if event.is_action_pressed("ui_cancel"):
@@ -72,6 +138,7 @@ func _ready() -> void:
 	tween.set_trans(Tween.TransitionType.TRANS_CUBIC)
 	tween.tween_property($Camera2D, "offset:y", 0, 0.8)
 	$SceneFader.fade_out()	
+	create_zoom_controls()
 
 	
 	# set timers and settings
