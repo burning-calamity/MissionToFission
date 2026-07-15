@@ -13,6 +13,8 @@ func _ready() -> void:
 	configure_settings()
 	animate_in()
 	
+	create_difficulty_selector()
+	setup_reactor_modes()
 	$UiButtonSound.connect_button_ui()
 	create_difficulty_selector()
 	
@@ -31,6 +33,99 @@ func _ready() -> void:
 		
 	# instantly load new map for debug
 	# animate_out("res://scenes/maps/3_lwr/lwr_simulate.tscn", "res://scenes/game_core/game_runner.tscn")
+
+func setup_reactor_modes() -> void:
+	var lwr_tutorial: Button = get_node("MarginContainer/VBoxContainer/MarginContainer2/ScrollContainer/HBoxContainer/light_water_reactor/Button/VBoxContainer2/s")
+	var lwr_game: Button = get_node("MarginContainer/VBoxContainer/MarginContainer2/ScrollContainer/HBoxContainer/light_water_reactor/Button/VBoxContainer2/game_mode_lwr")
+	lwr_tutorial.disabled = false
+	lwr_tutorial.text = "Tutorial"
+	lwr_tutorial.tooltip_text = ""
+	lwr_tutorial.remove_from_group("404")
+	lwr_tutorial.add_to_group("button_ui")
+	lwr_tutorial.pressed.connect(_on_tutorial_lwr_pressed)
+
+	lwr_game.disabled = false
+	lwr_game.text = "Game Mode"
+	lwr_game.tooltip_text = ""
+	lwr_game.remove_from_group("404")
+	lwr_game.add_to_group("button_ui")
+	lwr_game.pressed.connect(_on_game_mode_lwr_pressed)
+
+	create_reactor_card(
+		"candu_reactor",
+		"CANDU Reactor",
+		_on_tutorial_candu_pressed,
+		_on_game_mode_candu_pressed,
+		_on_simulate_mode_candu_pressed,
+	)
+	create_reactor_card(
+		"fast_breeder_reactor",
+		"Fast Breeder Reactor",
+		_on_tutorial_fast_breeder_pressed,
+		_on_game_mode_fast_breeder_pressed,
+		_on_simulate_mode_fast_breeder_pressed,
+	)
+	create_reactor_card(
+		"molten_salt_reactor",
+		"Molten Salt Reactor",
+		_on_tutorial_molten_salt_pressed,
+		_on_game_mode_molten_salt_pressed,
+		_on_simulate_mode_molten_salt_pressed,
+	)
+
+
+func create_reactor_card(
+		card_name: String,
+		title_text: String,
+		tutorial_callable: Callable,
+		game_callable: Callable,
+		simulate_callable: Callable,
+	) -> void:
+	var hbox: HBoxContainer = get_node("MarginContainer/VBoxContainer/MarginContainer2/ScrollContainer/HBoxContainer")
+	var card := AspectRatioContainer.new()
+	card.name = card_name
+	card.custom_minimum_size = Vector2(260, 260)
+	hbox.add_child(card)
+
+	var background := Button.new()
+	background.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	background.disabled = true
+	card.add_child(background)
+
+	var box := VBoxContainer.new()
+	box.set_anchors_preset(Control.PRESET_CENTER)
+	box.offset_left = -106.5
+	box.offset_top = -119.5
+	box.offset_right = 106.5
+	box.offset_bottom = 119.5
+	box.alignment = BoxContainer.ALIGNMENT_CENTER
+	background.add_child(box)
+
+	var title := Label.new()
+	title.text = title_text
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title.add_theme_color_override("font_color", Color(0.136826, 0.136826, 0.136826, 1))
+	title.add_theme_font_size_override("font_size", 25)
+	box.add_child(title)
+
+	var tutorial_button := Button.new()
+	tutorial_button.text = "Tutorial"
+	tutorial_button.add_to_group("button_ui")
+	tutorial_button.pressed.connect(tutorial_callable)
+	box.add_child(tutorial_button)
+
+	var game_button := Button.new()
+	game_button.text = "Game Mode"
+	game_button.add_to_group("button_ui")
+	game_button.pressed.connect(game_callable)
+	box.add_child(game_button)
+
+	var simulate_button := Button.new()
+	simulate_button.text = "Simulate mode"
+	simulate_button.add_to_group("button_ui")
+	simulate_button.pressed.connect(simulate_callable)
+	box.add_child(simulate_button)
+
 
 func configure_settings() -> void:
 	globals.reset_game_var()
@@ -203,3 +298,36 @@ func _on_game_mode_rbmk_pressed() -> void:
 
 func _on_simulate_mode_lwr_pressed() -> void:
 	animate_out("res://scenes/maps/3_lwr/lwr_simulate.tscn", "res://scenes/game_core/game_runner.tscn")
+
+func _on_tutorial_lwr_pressed() -> void:
+	animate_out("res://scenes/maps/3_lwr/lwr_tutorial.tscn", "res://scenes/game_core/game_runner.tscn")
+
+func _on_game_mode_lwr_pressed() -> void:
+	open_difficulty_selector("res://scenes/maps/3_lwr/lwr_game.tscn", "res://scenes/game_core/game_runner.tscn")
+
+func _on_tutorial_candu_pressed() -> void:
+	animate_out("res://scenes/maps/4_candu/tutorial.tscn", "res://scenes/game_core/game_runner.tscn")
+
+func _on_game_mode_candu_pressed() -> void:
+	open_difficulty_selector("res://scenes/maps/4_candu/candu_reactor_game.tscn", "res://scenes/game_core/game_runner.tscn")
+
+func _on_simulate_mode_candu_pressed() -> void:
+	animate_out("res://scenes/maps/4_candu/candu_reactor.tscn", "res://scenes/game_core/game_runner.tscn")
+
+func _on_tutorial_fast_breeder_pressed() -> void:
+	animate_out("res://scenes/maps/5_fast_breeder/tutorial.tscn", "res://scenes/game_core/game_runner.tscn")
+
+func _on_game_mode_fast_breeder_pressed() -> void:
+	open_difficulty_selector("res://scenes/maps/5_fast_breeder/fast_breeder_reactor_game.tscn", "res://scenes/game_core/game_runner.tscn")
+
+func _on_simulate_mode_fast_breeder_pressed() -> void:
+	animate_out("res://scenes/maps/5_fast_breeder/fast_breeder_reactor.tscn", "res://scenes/game_core/game_runner.tscn")
+
+func _on_tutorial_molten_salt_pressed() -> void:
+	animate_out("res://scenes/maps/6_molten_salt/tutorial.tscn", "res://scenes/game_core/game_runner.tscn")
+
+func _on_game_mode_molten_salt_pressed() -> void:
+	open_difficulty_selector("res://scenes/maps/6_molten_salt/molten_salt_reactor_game.tscn", "res://scenes/game_core/game_runner.tscn")
+
+func _on_simulate_mode_molten_salt_pressed() -> void:
+	animate_out("res://scenes/maps/6_molten_salt/molten_salt_reactor.tscn", "res://scenes/game_core/game_runner.tscn")
