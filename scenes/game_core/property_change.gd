@@ -30,7 +30,7 @@ static var upgrade_dict:Dictionary = {
 		"The speed of the control rods",
 		ControlRod.speed,
 		10,
-		100,
+		10000,
 		5,
 		0.75,
 		"↓ Control Rods Speed"

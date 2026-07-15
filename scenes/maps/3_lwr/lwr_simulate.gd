@@ -21,8 +21,8 @@ func _ready() -> void:
 	Water.moderation_strength = 0.90
 	
 	get_parent().get_node("Control").show()
-	get_parent().get_node("Control/Control/MarginContainer/VBoxContainer/Layer2").hide()
-	get_parent().get_node("Control/Control/MarginContainer/VBoxContainer/Tree").hide()
+	get_parent().get_node("Control/Control/MarginContainer/VBoxContainer/Layer2").show()
+	get_parent().get_node("Control/Control/MarginContainer/VBoxContainer/Tree").show()
 	get_parent().get_node("State").show()
 	get_parent().get_node("GameScore").hide()
 	
@@ -32,10 +32,15 @@ func _ready() -> void:
 	
 	
 	get_parent().build_grid_and_center(x_grid_range, y_grid_range, true, true, false, true, 3, false, true)
+	ensure_reactor_grid_exists()
 	
 	# cam.position.y = - 10000
 	
 	
+func ensure_reactor_grid_exists() -> void:
+	if get_tree().get_nodes_in_group("atoms").is_empty():
+		get_parent().build_grid_and_center(x_grid_range, y_grid_range, true, true, false, true, 3, false, true, true)
+
 func on_reactor_grid_changed() -> void:
 	resize_chamber_to_reactor()
 
