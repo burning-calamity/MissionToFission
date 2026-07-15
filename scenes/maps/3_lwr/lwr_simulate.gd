@@ -76,8 +76,12 @@ func resize_chamber_to_reactor() -> void:
 
 	_set_half_circle("HalfCircleWall", grid_width, chamber_half_height, false)
 	_set_half_circle("HalfCircleWalInner", grid_width, chamber_half_height, true)
-	$Turbine.position = Vector2(grid_width + 329.0, chamber_half_height + chamber_margin - 9.0)
-	get_node("Area2D-heat-exhanger/CollisionShape2D").position = $Turbine.position - Vector2(21.0, 12.0)
+	var turbine_scale: float = clampf(chamber_half_height / 460.0, 1.0, 2.4)
+	$Turbine.scale = Vector2(turbine_scale, turbine_scale)
+	$Turbine.position = Vector2(grid_width + chamber_half_height * 0.72, chamber_half_height + chamber_margin - 9.0)
+	var heat_exchanger_collision := get_node("Area2D-heat-exhanger/CollisionShape2D")
+	heat_exchanger_collision.position = $Turbine.position - Vector2(21.0, 12.0) * turbine_scale
+	heat_exchanger_collision.scale = Vector2(turbine_scale, turbine_scale)
 
 	_add_container_wall(Vector2(0, chamber_half_height + chamber_margin), chamber_half_height, 10, 90)
 	var vent_side_opening_half_height: float = minf(210.0, chamber_half_height)

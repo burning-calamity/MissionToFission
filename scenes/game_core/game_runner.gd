@@ -351,10 +351,13 @@ func center_cam_atoms() -> void:
 	for atom in atoms:
 		atom_x_positons.append(atom.global_position[0])
 	var center_x: float = (atom_x_positons.min() + atom_x_positons.max())/2
+	var viewport_width: float = get_viewport().get_visible_rect().size.x
+	var camera_zoom: float = maxf($Camera2D.zoom.x, 0.001)
+	var target_camera_x: float = center_x - viewport_width / (2.0 * camera_zoom)
 	var tween:Tween = get_tree().create_tween()
 	tween.set_ease(Tween.EaseType.EASE_OUT)
 	tween.set_trans(Tween.TransitionType.TRANS_CUBIC)
-	tween.tween_property($Camera2D, "position", Vector2(center_x -1920/2., 0), 1)
+	tween.tween_property($Camera2D, "position", Vector2(target_camera_x, 0), 1)
 	
 	# also update ctr rods 
 	ControlRod.update_control_rods()

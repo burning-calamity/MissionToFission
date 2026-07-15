@@ -18,24 +18,32 @@ func rebuild_wall() -> void:
 	create_half_circle_wall()
 	queue_redraw()
 
-func create_half_circle_wall():
-	var angle_step = deg_to_rad(arc_degrees) / segments
-	var start_angle = deg_to_rad(90.0 - arc_degrees / 2.0)
+func get_effective_segments() -> int:
+	return maxi(segments, int(ceil(deg_to_rad(arc_degrees) * radius / 28.0)))
 
-	for i in range(segments + 1):
+func get_segment_wall_length() -> float:
+	return maxf(wall_length, deg_to_rad(arc_degrees) * radius / get_effective_segments() * 1.35)
+
+func create_half_circle_wall():
+	var effective_segments: int = get_effective_segments()
+	var angle_step = deg_to_rad(arc_degrees) / effective_segments
+	var start_angle = deg_to_rad(90.0 - arc_degrees / 2.0)
+	var segment_wall_length: float = get_segment_wall_length()
+
+	for i in range(effective_segments + 1):
 		if skip_first_and_last:
-			if i == 0 or i == segments:
+			if i == 0 or i == effective_segments:
 				continue
 		var angle = start_angle + i * angle_step
 		var pos = Vector2(cos(angle), sin(angle)) * radius
 
 		var wall = StaticBody2D.new()
 		wall.position = pos
-		wall.rotation = angle
+		wall.rotation = angle + PI / 2.0
 
 		var shape = CollisionShape2D.new()
 		var rect = RectangleShape2D.new()
-		rect.extents = Vector2(wall_length / 2.0, wall_thickness / 2.0)
+		rect.extents = Vector2(segment_wall_length / 2.0, wall_thickness / 2.0)
 		shape.shape = rect
 
 		wall.add_child(shape)
@@ -47,4 +55,4 @@ func _draw():
 
 	# Draw the arc visually to match the collider
 	var start_angle = 0
-	draw_arc(Vector2.ZERO, radius, start_angle, 3.14, segments*5, arc_color, 20)
+	draw_arc(Vector2.ZERO, radius, start_angle, PI, get_effective_segments() * 5, arc_color, 20)
