@@ -40,6 +40,18 @@ func _ready() -> void:
 	# cam.position.y = - 10000
 	
 	
+func uses_water_on_expansion() -> bool:
+	return true
+
+func uses_moderator_rods_on_expansion() -> bool:
+	return false
+
+func get_expansion_control_rod_spacer() -> int:
+	return 3
+
+func uses_xenon_upgrades() -> bool:
+	return true
+
 func ensure_reactor_grid_exists() -> void:
 	if get_tree().get_nodes_in_group("atoms").is_empty():
 		get_parent().build_grid_and_center(x_grid_range, y_grid_range, true, true, false, true, 3, false, true, true)

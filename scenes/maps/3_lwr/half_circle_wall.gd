@@ -13,6 +13,7 @@ func _ready():
 func rebuild_wall() -> void:
 	for child in get_children():
 		if child is StaticBody2D:
+			remove_child(child)
 			child.queue_free()
 	create_half_circle_wall()
 	queue_redraw()

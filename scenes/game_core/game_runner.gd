@@ -451,15 +451,57 @@ var upgrade_dict_rbmk:Dictionary = {
 	],
 }
 
+func _reactor_uses_water() -> bool:
+	if map_loaded != null and map_loaded.has_method("uses_water_on_expansion"):
+		return bool(map_loaded.call("uses_water_on_expansion"))
+	return Atom.enable_moderation
+
+func _reactor_uses_moderator_rods() -> bool:
+	if map_loaded != null and map_loaded.has_method("uses_moderator_rods_on_expansion"):
+		return bool(map_loaded.call("uses_moderator_rods_on_expansion"))
+	return Atom.enable_moderation
+
+func _reactor_control_rod_spacer() -> int:
+	if map_loaded != null and map_loaded.has_method("get_expansion_control_rod_spacer"):
+		return int(map_loaded.call("get_expansion_control_rod_spacer"))
+	return 4 if Atom.enable_moderation else 3
+
+func _reactor_uses_xenon() -> bool:
+	if map_loaded != null and map_loaded.has_method("uses_xenon_upgrades"):
+		return bool(map_loaded.call("uses_xenon_upgrades"))
+	return Atom.enable_xenon
+
+func _remove_water_upgrade_choices(upgrades: Dictionary) -> void:
+	upgrades.erase("↓ Water flow")
+	upgrades.erase("↑ Water absorb chance")
+	upgrades.erase("↑ Water flow")
+	upgrades.erase("↓ Water absorb chance")
+
+func _remove_xenon_upgrade_choices(upgrades: Dictionary) -> void:
+	upgrades.erase("↑ Xenon chance")
+	upgrades.erase("↓ Xenon chance")
+
+func _build_available_upgrades(include_helpers: bool) -> Dictionary:
+	var available_upgrades: Dictionary = upgrade_dict.duplicate()
+	if Atom.enable_moderation:
+		available_upgrades.merge(upgrade_dict_rbmk)
+	if include_helpers:
+		available_upgrades.merge(helper_upgrade_dict)
+		if Atom.enable_moderation:
+			available_upgrades.merge(helper_upgrade_dict_rbmk)
+	if not _reactor_uses_water():
+		_remove_water_upgrade_choices(available_upgrades)
+	if not _reactor_uses_xenon():
+		_remove_xenon_upgrade_choices(available_upgrades)
+	return available_upgrades
+
 func _on_upgrade_timer_timeout() -> void:
 	'''
 	generates 3 random upgrades and calls the pop up to ask whcih one user want
 	'''
 	
 	game_paused = true
-	var available_upgrades: Dictionary = upgrade_dict.duplicate()
-	if Atom.enable_moderation:
-		available_upgrades.merge(upgrade_dict_rbmk)
+	var available_upgrades: Dictionary = _build_available_upgrades(false)
 	var keys:Array = available_upgrades.keys()
 	keys.shuffle()
 	var random_keys:Array = keys.slice(0, 2)
@@ -469,11 +511,16 @@ func _on_upgrade_timer_timeout() -> void:
 		var helper_upgrades: Dictionary = helper_upgrade_dict.duplicate()
 		if Atom.enable_moderation:
 			helper_upgrades.merge(helper_upgrade_dict_rbmk)
+		if not _reactor_uses_water():
+			_remove_water_upgrade_choices(helper_upgrades)
+		if not _reactor_uses_xenon():
+			_remove_xenon_upgrade_choices(helper_upgrades)
 		var helper_keys: Array = helper_upgrades.keys()
-		helper_keys.shuffle()
-		var helper_key: String = str(helper_keys[0])
-		available_upgrades.merge(helper_upgrades)
-		random_keys[randi() % random_keys.size()] = helper_key
+		if not helper_keys.is_empty():
+			helper_keys.shuffle()
+			var helper_key: String = str(helper_keys[0])
+			available_upgrades.merge(helper_upgrades)
+			random_keys[randi() % random_keys.size()] = helper_key
 
 	$pauseMenu.upgrade_game_mode(random_keys, available_upgrades)
 	
@@ -483,11 +530,7 @@ func call_upgrade(key:String) -> void:
 	thhis function is called from the pop up, it will call the function to activate the user choice
 	'''
 	
-	var available_upgrades: Dictionary = upgrade_dict.duplicate()
-	available_upgrades.merge(helper_upgrade_dict)
-	if Atom.enable_moderation:
-		available_upgrades.merge(upgrade_dict_rbmk)
-		available_upgrades.merge(helper_upgrade_dict_rbmk)
+	var available_upgrades: Dictionary = _build_available_upgrades(true)
 	available_upgrades[key][0].call()
 	var add_x:int = 0
 	var add_y:int = 0
@@ -495,38 +538,22 @@ func call_upgrade(key:String) -> void:
 		add_y += 1
 	else:
 		add_x += 1
-	# messy code. if atom enable moderation then its a rbmk reator. This function should be rethinked
-	if Atom.enable_moderation:
-		var expansion_add_water: bool = true
-		if map_loaded != null and map_loaded.has_method("uses_water_on_expansion"):
-			expansion_add_water = map_loaded.call("uses_water_on_expansion")
-		build_grid_and_center(
-			x_row_build + add_x,
-			y_row_build + add_y,
-			true,
-			true,
-			true,
-			false,
-			4,
-			true,
-			expansion_add_water,
-			false,
-			true
-		)
-	else:
-		build_grid_and_center(
-				x_row_build + add_x,
-				y_row_build + add_y,
-				true,
-				true,
-				true,
-				false,
-				3,
-				false,
-				false,
-				false,
-				true
-			)
+	var expansion_add_water: bool = _reactor_uses_water()
+	var expansion_add_moderator: bool = _reactor_uses_moderator_rods()
+	var expansion_ctlrod_spacer: int = _reactor_control_rod_spacer()
+	build_grid_and_center(
+		x_row_build + add_x,
+		y_row_build + add_y,
+		true,
+		true,
+		true,
+		false,
+		expansion_ctlrod_spacer,
+		expansion_add_moderator,
+		expansion_add_water,
+		false,
+		true
+	)
 
 func make_bigger_reactor() -> void:
 	'''

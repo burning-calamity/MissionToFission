@@ -35,6 +35,18 @@ func _ready() -> void:
 	if show_tutorial_text:
 		add_tutorial_label()
 
+func uses_water_on_expansion() -> bool:
+	return true
+
+func uses_moderator_rods_on_expansion() -> bool:
+	return true
+
+func get_expansion_control_rod_spacer() -> int:
+	return ctlrod_spacer
+
+func uses_xenon_upgrades() -> bool:
+	return true
+
 func add_tutorial_label() -> void:
 	var label := Label.new()
 	label.position = Vector2(120, 760)
