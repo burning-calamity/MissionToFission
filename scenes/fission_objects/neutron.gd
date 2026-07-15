@@ -10,6 +10,7 @@ var is_fast:bool = false
 var is_dead:bool = false # parameter to fade out
 var just_born:bool = true # parameter to fade in 
 var current_velocity:Vector2 = Vector2()
+var is_counted: bool = false
 
 
 static var enable_moderation:bool = false
@@ -26,12 +27,19 @@ func _ready() -> void:
 
 	
 	add_to_group("neutrons")
+	GameRunner.neutron_counter += 1
+	is_counted = true
 	
 	if enable_moderation:
 		set_collision_layer_value(globals.moderator_neutron_slot, true)
 		set_collision_layer_value(globals.neutrol_collide_slot, false)
 		is_fast = true 
 	
+
+func _exit_tree() -> void:
+	if is_counted:
+		GameRunner.neutron_counter = maxi(0, GameRunner.neutron_counter - 1)
+		is_counted = false
 
 func _draw() -> void:
 	draw_circle(Vector2(0, 0), self.radius, self.color)

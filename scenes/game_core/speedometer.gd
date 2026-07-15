@@ -8,19 +8,23 @@ var green_angles_hift: float = 0.0
 
 func set_current_value(new_value: int) -> void:
 	current_value = new_value
-	meter_angle = remap(current_value, min_value, max_value, 0, 180)
+	var needed_max: int = maxi(maxi(1000, current_value), GameRunner.goal + GameRunner.margin_error)
+	max_value = int(ceil(needed_max / 1000.0) * 1000)
+	meter_angle = remap(clampi(current_value, min_value, max_value), min_value, max_value, 0, 180)
 	# calc new angle for speedmetor. c
 	queue_redraw()
 
 
 func _draw() -> void:
+	$TextureProgressBar.max_value = max_value
+	$TextureProgressBar/max.text = str(max_value)
 	$TextureProgressBar/currentVal.text = str(current_value)
 	$TextureProgressBar/Indi.rotation = deg_to_rad(meter_angle - 150)
 	if GameRunner.game_mode_enabled:
 		# calc accepted range
 		$TextureProgressBar.value = GameRunner.margin_error * 2
 		# calc shift
-		green_angles_hift = remap(GameRunner.goal - GameRunner.margin_error, 0, 1000, 0, 180)
+		green_angles_hift = remap(GameRunner.goal - GameRunner.margin_error, 0, max_value, 0, 180)
 		$TextureProgressBar.radial_initial_angle = 270+green_angles_hift
 		# $TextureProgressBar/Label.rotation_degrees = 270+green_angles_hift+23
 		$TextureProgressBar/Label.text = "Goal: "+str(GameRunner.goal)+" ± " + str(GameRunner.margin_error)
