@@ -497,19 +497,22 @@ func call_upgrade(key:String) -> void:
 		add_x += 1
 	# messy code. if atom enable moderation then its a rbmk reator. This function should be rethinked
 	if Atom.enable_moderation:
-			build_grid_and_center(
-				x_row_build + add_x,
-				y_row_build + add_y,
-				true,
-				true,
-				true,
-				false,
-				4,
-				true,
-				true,
-				false,
-				true
-			)
+		var expansion_add_water: bool = true
+		if map_loaded != null and map_loaded.has_method("uses_water_on_expansion"):
+			expansion_add_water = map_loaded.call("uses_water_on_expansion")
+		build_grid_and_center(
+			x_row_build + add_x,
+			y_row_build + add_y,
+			true,
+			true,
+			true,
+			false,
+			4,
+			true,
+			expansion_add_water,
+			false,
+			true
+		)
 	else:
 		build_grid_and_center(
 				x_row_build + add_x,

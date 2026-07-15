@@ -34,6 +34,9 @@ func _ready() -> void:
 	if show_tutorial_text:
 		add_tutorial_label()
 
+func uses_water_on_expansion() -> bool:
+	return false
+
 func add_tutorial_label() -> void:
 	var label := Label.new()
 	label.position = Vector2(120, 750)
