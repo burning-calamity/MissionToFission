@@ -8,6 +8,7 @@ var hot_color:Color = Color("FF4949")
 var gone_color:Color = Color("FFFFFF")
 var speed: float = 10
 var temp: float = 0.
+var last_draw_temp_bucket: int = -1
 
 static var water_absorb_chance: float = 0.05
 static var cool_of_speed:float = 15
@@ -44,17 +45,25 @@ func initialize(pos_to_set:Vector2) -> void:
 	
 
 func _process(_delta:float) -> void:
+	if self.temp <= 0:
+		return
 	self.temp = clampf(self.temp - (self.cool_of_speed*_delta), 0, 100000000)
-	# consider only redraw on temot change 
-	queue_redraw()
+	queue_redraw_if_temperature_bucket_changed()
 	
 	# if self.temp > 0:
 	# 	linear_velocity += Vector2(0, - self.temp/1000)
 
 
+func queue_redraw_if_temperature_bucket_changed() -> void:
+	var draw_temp_bucket: int = int(clampf(self.temp, 0, 100))
+	if draw_temp_bucket != last_draw_temp_bucket:
+		last_draw_temp_bucket = draw_temp_bucket
+		queue_redraw()
+
 func on_entered_area(body: Node2D) -> void:
 	if body is Neutron:
 		self.temp += 5
+		queue_redraw_if_temperature_bucket_changed()
 		if self.temp < 100:
 			if randf() < water_absorb_chance:
 				body.kill_self_deflate()

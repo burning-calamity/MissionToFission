@@ -33,6 +33,7 @@ func _ready() -> void:
 	
 	get_parent().build_grid_and_center(x_grid_range, y_grid_range, true, true, false, true, 3, false, true)
 	ensure_reactor_grid_exists()
+	call_deferred("fit_camera_to_reactor")
 	
 	# cam.position.y = - 10000
 	
@@ -43,6 +44,11 @@ func ensure_reactor_grid_exists() -> void:
 
 func on_reactor_grid_changed() -> void:
 	resize_chamber_to_reactor()
+	call_deferred("fit_camera_to_reactor")
+
+func fit_camera_to_reactor() -> void:
+	if get_parent().has_method("auto_zoom_to_reactor"):
+		get_parent().call("auto_zoom_to_reactor")
 
 func resize_chamber_to_reactor() -> void:
 	# Keep the LWR chamber large enough for expanded atom grids without rebuilding every frame.

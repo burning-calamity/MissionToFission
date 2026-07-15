@@ -61,25 +61,17 @@ func initialize(pos_to_set:Vector2) -> void:
 	
 
 func _process(delta: float) -> void:
-	if (even and move_even) or (not even and not move_even):
-		# automatic control here 
-		if enable_auomatic:
-			# move up 
-			if GameRunner.neutron_counter > GameRunner.goal:
-				direction = 1
-			elif GameRunner.neutron_counter < GameRunner.goal:
-				direction = -1
-			select_rod_bank_for_direction(direction)
-			
-		position.y = clampf(position.y+direction*delta*speed, min_height, max_height)
-		
-	# switch 
-	if move_even and position.y == max_height:
-		move_even = not move_even
+	# Move every control rod together. The old alternating-bank logic could leave
+	# one bank stuck at an endpoint after reactor expansion.
+	if enable_auomatic:
+		if GameRunner.neutron_counter > GameRunner.goal:
+			direction = 1
+		elif GameRunner.neutron_counter < GameRunner.goal:
+			direction = -1
+		else:
+			direction = 0
 
-	elif not move_even and position.y == min_height:
-		move_even = not move_even
-
+	position.y = clampf(position.y + direction * delta * speed, min_height, max_height)
 
 			
 func get_input() -> void:
