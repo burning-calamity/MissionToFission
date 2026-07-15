@@ -16,6 +16,7 @@ func _ready() -> void:
 	create_difficulty_selector()
 	setup_reactor_modes()
 	$UiButtonSound.connect_button_ui()
+	create_difficulty_selector()
 	
 	var margin:float = 65.
 	for x in range(-1, 30):
