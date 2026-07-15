@@ -91,9 +91,11 @@ func get_input() -> void:
 	if Input.is_action_pressed("s") or Input.is_action_pressed("ui_down"):
 		enable_auomatic = false
 		direction = 1
+		select_rod_bank_for_direction(direction)
 	if Input.is_action_pressed("w") or Input.is_action_pressed("ui_up"):
 		enable_auomatic = false
 		direction = -1
+		select_rod_bank_for_direction(direction)
 
 		
 func _physics_process(_delta:float) -> void:
