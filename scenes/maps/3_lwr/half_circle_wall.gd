@@ -8,7 +8,14 @@ extends Node2D
 @export var skip_first_and_last: bool = false
 
 func _ready():
+	rebuild_wall()
+
+func rebuild_wall() -> void:
+	for child in get_children():
+		if child is StaticBody2D:
+			child.queue_free()
 	create_half_circle_wall()
+	queue_redraw()
 
 func create_half_circle_wall():
 	var angle_step = deg_to_rad(arc_degrees) / segments
