@@ -61,24 +61,17 @@ func initialize(pos_to_set:Vector2) -> void:
 	
 
 func _process(delta: float) -> void:
-	if (even and move_even) or (not even and not move_even):
-		# automatic control here 
-		if enable_auomatic:
-			# move up 
-			if GameRunner.neutron_counter > GameRunner.goal:
-				direction = 1
-			elif GameRunner.neutron_counter < GameRunner.goal:
-				direction = -1
-			
-		position.y = clampf(position.y+direction*delta*speed, min_height, max_height)
-		
-	# switch 
-	if move_even and position.y == max_height:
-		move_even = not move_even
+	# Move every control rod together. The old alternating-bank logic could leave
+	# one bank stuck at an endpoint after reactor expansion.
+	if enable_auomatic:
+		if GameRunner.neutron_counter > GameRunner.goal:
+			direction = 1
+		elif GameRunner.neutron_counter < GameRunner.goal:
+			direction = -1
+		else:
+			direction = 0
 
-	elif not move_even and position.y == min_height:
-		move_even = not move_even
-
+	position.y = clampf(position.y + direction * delta * speed, min_height, max_height)
 
 			
 func get_input() -> void:
@@ -107,14 +100,34 @@ func _physics_process(_delta:float) -> void:
 	get_input()
 	
 static func update_control_rods() -> void:
+	var previous_min_height: float = min_height
+	var previous_max_height: float = max_height
 	rod_height = GameRunner.y_row_build * GameRunner.margin 
 	min_height = -rod_height/2 + GameRunner.margin/2
 	max_height = rod_height/2 + GameRunner.margin/2
 	
 	# que redraw
 	for ctrlrod: CanvasItem in _registered_nodes:
-		ctrlrod.position.y = clampf(ctrlrod.position.y, min_height, max_height)
+		var was_fully_lowered: bool = absf(ctrlrod.position.y - previous_max_height) <= 1.0
+		var was_fully_raised: bool = absf(ctrlrod.position.y - previous_min_height) <= 1.0
+		if was_fully_lowered:
+			ctrlrod.position.y = max_height
+		elif was_fully_raised:
+			ctrlrod.position.y = min_height
+		else:
+			ctrlrod.position.y = clampf(ctrlrod.position.y, min_height, max_height)
 		ctrlrod.queue_redraw()
+
+static func select_rod_bank_for_direction(input_direction: float) -> void:
+	if input_direction == 0:
+		return
+	for ctrlrod: ControlRod in _registered_nodes:
+		if input_direction < 0 and absf(ctrlrod.position.y - max_height) <= 1.0:
+			move_even = ctrlrod.even
+			return
+		if input_direction > 0 and absf(ctrlrod.position.y - min_height) <= 1.0:
+			move_even = ctrlrod.even
+			return
 
 
 func _on_area_entered(area: Area2D) -> void:
