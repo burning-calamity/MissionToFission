@@ -18,7 +18,9 @@ func _ready() -> void:
 	GameRunner.goal = 200 # set this to let ctrl rods  autoamtic aim for something
 
 	Water.cool_of_speed = 0.1
-	Water.moderation_strength = 0.90
+	# LWR water is the main moderator: fast (white-dotted) neutrons should become thermal quickly instead of being absorbed first.
+	Water.moderation_strength = 0.55
+	Water.water_absorb_chance = 0.01
 	
 	get_parent().get_node("Control").show()
 	get_parent().get_node("Control/Control/MarginContainer/VBoxContainer/Layer2").show()
@@ -66,7 +68,8 @@ func resize_chamber_to_reactor() -> void:
 	get_node("Area2D-heat-exhanger/CollisionShape2D").position = $Turbine.position - Vector2(21.0, 12.0)
 
 	_add_container_wall(Vector2(0, chamber_half_height + chamber_margin), chamber_half_height, 10, 90)
-	_add_container_wall(Vector2(grid_width, chamber_half_height + chamber_margin - 5), chamber_half_height, 10, -90)
+	var vent_side_opening_half_height: float = minf(210.0, chamber_half_height)
+	_add_container_wall(Vector2(grid_width, chamber_half_height + chamber_margin - 5), vent_side_opening_half_height, 10, -90)
 	_add_container_wall(Vector2(grid_width / 2.0, 10), grid_width / 2.0 + 10, 10, 180)
 	_add_container_wall(Vector2(grid_width / 2.0, 20 + 2.0 * chamber_half_height), grid_width / 2.0 + 10, 10, 0)
 
@@ -75,6 +78,8 @@ func _set_half_circle(node_path: NodePath, chamber_width: float, chamber_half_he
 	half_circle.position = Vector2(chamber_width, chamber_half_height + 15.0)
 	half_circle.radius = chamber_half_height + 5.0 if not skip_edges else maxf(200.0, chamber_half_height * 0.45)
 	half_circle.skip_first_and_last = skip_edges
+	if half_circle.has_method("rebuild_wall"):
+		half_circle.call("rebuild_wall")
 
 func _add_container_wall(pos: Vector2, height_to_set: float, width_to_set: float, rot: float) -> void:
 	var new_container: Node = wall_scene.instantiate()
