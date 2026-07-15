@@ -52,7 +52,16 @@ static var upgrade_dict:Dictionary = {
 		100,
 		5
 	],
+	"Xenon Chance": [
+		"func_xenon_chance",
+		"Chance that fission waste later becomes xenon",
+		int(roundf(Atom.become_xenon_later_chance*100)),
+		0,
+		100,
+		5
+	],
 }
+
 
 	
 func _ready() -> void:
@@ -72,7 +81,7 @@ func _ready() -> void:
 		section.set_tooltip_text(0, upgrade_dict[key][1])
 
 func _on_mouse_entered() -> void:
-	tree.set_custom_minimum_size(Vector2(500, 220))
+	tree.set_custom_minimum_size(Vector2(500, 260))
 
 func _on_mouse_exited() -> void:
 	tree.set_custom_minimum_size(Vector2(500, 30))
@@ -87,7 +96,8 @@ func set_vals() -> void:
 	sections[1].set_range(0, Atom.enrich_speed)
 	sections[2].set_range(0, ControlRod.speed)
 	sections[3].set_range(0, int(roundf((1-Atom.enrich_percent)*100)))
-	sections[4].set_range(0, int(roundf((1-Atom.instant_enrich_chance)*100)))
+	sections[4].set_range(0, int(roundf(Atom.instant_enrich_chance*100)))
+	sections[5].set_range(0, int(roundf(Atom.become_xenon_later_chance*100)))
 	
 	
 func _on_item_edited() -> void:
@@ -104,6 +114,7 @@ func _on_item_edited() -> void:
 	Atom.enrich_percent = 1 - (float(sections[3].get_range(0))/100)
 	
 	Atom.instant_enrich_chance = float(sections[4].get_range(0))/100
+	Atom.become_xenon_later_chance = float(sections[5].get_range(0))/100
 	
 
 	# update all values  for spont time
