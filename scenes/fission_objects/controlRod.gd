@@ -115,9 +115,11 @@ static func update_control_rods() -> void:
 	
 	# que redraw
 	for ctrlrod: CanvasItem in _registered_nodes:
-		if is_equal_approx(ctrlrod.position.y, previous_max_height):
+		var was_fully_lowered: bool = absf(ctrlrod.position.y - previous_max_height) <= 1.0
+		var was_fully_raised: bool = absf(ctrlrod.position.y - previous_min_height) <= 1.0
+		if was_fully_lowered:
 			ctrlrod.position.y = max_height
-		elif is_equal_approx(ctrlrod.position.y, previous_min_height):
+		elif was_fully_raised:
 			ctrlrod.position.y = min_height
 		else:
 			ctrlrod.position.y = clampf(ctrlrod.position.y, min_height, max_height)

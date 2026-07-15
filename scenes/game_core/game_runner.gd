@@ -14,6 +14,7 @@ var controlRod_scene:PackedScene = load("res://scenes/fission_objects/controlRod
 var moderator_scene:PackedScene = load("res://scenes/fission_objects/moderator.tscn")
 var water_scene:PackedScene = load("res://scenes/fission_objects/water.tscn")
 var zoom_step: float = 0.1
+var bottom_ui_margin: float = 110.0
 
 signal toggle_game_paused(is_paused: bool)
 
@@ -55,9 +56,9 @@ func create_zoom_controls() -> void:
 	var panel := PanelContainer.new()
 	panel.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
 	panel.offset_left = -185
-	panel.offset_top = -70
+	panel.offset_top = -bottom_ui_margin - 50
 	panel.offset_right = 185
-	panel.offset_bottom = -20
+	panel.offset_bottom = -bottom_ui_margin
 	canvas.add_child(panel)
 
 	var row := HBoxContainer.new()
@@ -104,10 +105,14 @@ func auto_zoom_to_reactor() -> void:
 		min_pos.y = minf(min_pos.y, atom.global_position.y)
 		max_pos.x = maxf(max_pos.x, atom.global_position.x)
 		max_pos.y = maxf(max_pos.y, atom.global_position.y)
-	var reactor_size: Vector2 = max_pos - min_pos + Vector2(margin * 4, margin * 4)
+	var reactor_padding := Vector2(margin * 4, margin * 4)
+	var reactor_size: Vector2 = max_pos - min_pos + reactor_padding
 	var viewport_size: Vector2 = get_viewport().get_visible_rect().size
 	var target_zoom: float = minf(viewport_size.x / reactor_size.x, viewport_size.y / reactor_size.y)
 	set_camera_zoom(target_zoom)
+	var clamped_zoom: float = $Camera2D.zoom.x
+	var reactor_center: Vector2 = (min_pos + max_pos) / 2.0
+	$Camera2D.position = reactor_center - (viewport_size / (2.0 * clamped_zoom))
 
 func _unhandled_input(event:InputEvent) -> void:
 	# close program on esc button
@@ -332,6 +337,9 @@ func build_grid_and_center(
 			new_moderator.initialize(Vector2(margin + margin*x +0.5*margin, 0)) 
 			add_child(new_moderator)
 
+
+	if map_loaded != null and map_loaded.has_method("on_reactor_grid_changed"):
+		map_loaded.call("on_reactor_grid_changed")
 
 	# tween camera to center newly build grids of atoms. Only x position at the moment
 	center_cam_atoms()

@@ -60,6 +60,14 @@ static var upgrade_dict:Dictionary = {
 		100,
 		5
 	],
+	"Water Flow": [
+		"func_water_flow",
+		"How quickly water removes heat in water-cooled or water-moderated reactors",
+		Water.cool_of_speed,
+		0.1,
+		60,
+		0.5
+	],
 }
 
 
@@ -81,7 +89,7 @@ func _ready() -> void:
 		section.set_tooltip_text(0, upgrade_dict[key][1])
 
 func _on_mouse_entered() -> void:
-	tree.set_custom_minimum_size(Vector2(500, 260))
+	tree.set_custom_minimum_size(Vector2(500, 300))
 
 func _on_mouse_exited() -> void:
 	tree.set_custom_minimum_size(Vector2(500, 30))
@@ -98,6 +106,7 @@ func set_vals() -> void:
 	sections[3].set_range(0, int(roundf((1-Atom.enrich_percent)*100)))
 	sections[4].set_range(0, int(roundf(Atom.instant_enrich_chance*100)))
 	sections[5].set_range(0, int(roundf(Atom.become_xenon_later_chance*100)))
+	sections[6].set_range(0, Water.cool_of_speed)
 	
 	
 func _on_item_edited() -> void:
@@ -115,6 +124,7 @@ func _on_item_edited() -> void:
 	
 	Atom.instant_enrich_chance = float(sections[4].get_range(0))/100
 	Atom.become_xenon_later_chance = float(sections[5].get_range(0))/100
+	Water.cool_of_speed = sections[6].get_range(0)
 	
 
 	# update all values  for spont time

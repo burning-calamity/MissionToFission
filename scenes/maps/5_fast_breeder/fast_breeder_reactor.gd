@@ -21,8 +21,8 @@ func _ready() -> void:
 	GameRunner.game_not_started = game_mode
 
 	get_parent().get_node("Control").show()
-	get_parent().get_node("Control/Control/MarginContainer/VBoxContainer/Layer2").show()
-	get_parent().get_node("Control/Control/MarginContainer/VBoxContainer/Tree").show()
+	get_parent().get_node("Control/Control/MarginContainer/VBoxContainer/Layer2").visible = not game_mode
+	get_parent().get_node("Control/Control/MarginContainer/VBoxContainer/Tree").visible = not game_mode
 	get_parent().get_node("State").show()
 	get_parent().get_node("GameScore").visible = game_mode
 
