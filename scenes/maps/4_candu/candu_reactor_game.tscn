@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scenes/maps/4_candu/candu_reactor_game.gd" id="1_candu_game"]
+
+[node name="CanduReactorGame" type="Node2D"]
+script = ExtResource("1_candu_game")

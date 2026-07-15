@@ -2,7 +2,7 @@ extends Node
 
 class_name GameRunner
 
-static var map_to_load: String = "res://scenes/maps/basic_reactor.tscn"
+static var map_to_load: String = "res://scenes/maps/1_basic_reactor/basic_reactor.tscn"
 static var map_loaded:Node = null
 static var neutron_on_click: bool = true
 
@@ -13,6 +13,8 @@ var atom_scene:PackedScene = load("res://scenes/fission_objects/atom.tscn")
 var controlRod_scene:PackedScene = load("res://scenes/fission_objects/controlRod.tscn")
 var moderator_scene:PackedScene = load("res://scenes/fission_objects/moderator.tscn")
 var water_scene:PackedScene = load("res://scenes/fission_objects/water.tscn")
+var zoom_step: float = 0.1
+var bottom_ui_margin: float = 110.0
 
 signal toggle_game_paused(is_paused: bool)
 
@@ -27,6 +29,7 @@ static var game_not_started: bool = true
 static var goal:int = 400
 static var margin_error:int = 100
 static var neutron_counter: int = 0
+static var difficulty_modifier: float = 1.0
 var countdown_till_loss:int = 30 
 var countdown_till_upgrade:int = 10 # 1 minutes
 static var score_timer:float = 0.
@@ -42,6 +45,75 @@ var game_paused: bool = false:
 		emit_signal("toggle_game_paused", game_paused)
 		
 		
+
+func create_zoom_controls() -> void:
+	if has_node("ZoomControls"):
+		return
+	var canvas := CanvasLayer.new()
+	canvas.name = "ZoomControls"
+	add_child(canvas)
+
+	var panel := PanelContainer.new()
+	panel.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
+	panel.offset_left = -185
+	panel.offset_top = -bottom_ui_margin - 50
+	panel.offset_right = 185
+	panel.offset_bottom = -bottom_ui_margin
+	canvas.add_child(panel)
+
+	var row := HBoxContainer.new()
+	row.alignment = BoxContainer.ALIGNMENT_CENTER
+	row.add_theme_constant_override("separation", 12)
+	panel.add_child(row)
+
+	var zoom_out_button := Button.new()
+	zoom_out_button.text = "Zoom -"
+	zoom_out_button.pressed.connect(_on_zoom_out_pressed)
+	row.add_child(zoom_out_button)
+
+	var auto_zoom_button := Button.new()
+	auto_zoom_button.text = "Auto Zoom"
+	auto_zoom_button.pressed.connect(_on_auto_zoom_pressed)
+	row.add_child(auto_zoom_button)
+
+	var zoom_in_button := Button.new()
+	zoom_in_button.text = "Zoom +"
+	zoom_in_button.pressed.connect(_on_zoom_in_pressed)
+	row.add_child(zoom_in_button)
+
+func _on_zoom_out_pressed() -> void:
+	set_camera_zoom($Camera2D.zoom.x - zoom_step)
+
+func _on_zoom_in_pressed() -> void:
+	set_camera_zoom($Camera2D.zoom.x + zoom_step)
+
+func _on_auto_zoom_pressed() -> void:
+	auto_zoom_to_reactor()
+
+func set_camera_zoom(new_zoom: float) -> void:
+	var clamped_zoom: float = clampf(new_zoom, 0.25, 2.0)
+	$Camera2D.zoom = Vector2(clamped_zoom, clamped_zoom)
+
+func auto_zoom_to_reactor() -> void:
+	var atoms: Array[Node] = get_tree().get_nodes_in_group("atoms")
+	if atoms.is_empty():
+		return
+	var min_pos: Vector2 = atoms[0].global_position
+	var max_pos: Vector2 = atoms[0].global_position
+	for atom in atoms:
+		min_pos.x = minf(min_pos.x, atom.global_position.x)
+		min_pos.y = minf(min_pos.y, atom.global_position.y)
+		max_pos.x = maxf(max_pos.x, atom.global_position.x)
+		max_pos.y = maxf(max_pos.y, atom.global_position.y)
+	var reactor_padding := Vector2(margin * 4, margin * 4)
+	var reactor_size: Vector2 = max_pos - min_pos + reactor_padding
+	var viewport_size: Vector2 = get_viewport().get_visible_rect().size
+	var target_zoom: float = minf(viewport_size.x / reactor_size.x, viewport_size.y / reactor_size.y)
+	set_camera_zoom(target_zoom)
+	var clamped_zoom: float = $Camera2D.zoom.x
+	var reactor_center: Vector2 = (min_pos + max_pos) / 2.0
+	$Camera2D.position = reactor_center - (viewport_size / (2.0 * clamped_zoom))
+
 func _unhandled_input(event:InputEvent) -> void:
 	# close program on esc button
 	if event.is_action_pressed("ui_cancel"):
@@ -71,6 +143,7 @@ func _ready() -> void:
 	tween.set_trans(Tween.TransitionType.TRANS_CUBIC)
 	tween.tween_property($Camera2D, "offset:y", 0, 0.8)
 	$SceneFader.fade_out()	
+	create_zoom_controls()
 
 	
 	# set timers and settings
@@ -102,15 +175,6 @@ func _process(_delta: float) -> void:
 	# cam.position.x += direction * 500 * _delta
 
 func game_logic(dt:float) -> void:
-	
-	# count neutrons this doesnt need to be every 1/60 sec
-	neutron_counter = len(get_tree().get_nodes_in_group("neutrons"))
-	if game_mode_enabled and neutron_counter > 1000:
-		end_game_messge = "
-		Reactor reactivity is over.
-		\n 1000 It's too much until 
-		\n the game is optimzied sorry!"
-		lost()
 	
 	# check if game should start
 	if game_mode_enabled and game_not_started:
@@ -274,6 +338,9 @@ func build_grid_and_center(
 			add_child(new_moderator)
 
 
+	if map_loaded != null and map_loaded.has_method("on_reactor_grid_changed"):
+		map_loaded.call("on_reactor_grid_changed")
+
 	# tween camera to center newly build grids of atoms. Only x position at the moment
 	center_cam_atoms()
 	
@@ -339,6 +406,36 @@ var upgrade_dict:Dictionary = {
 	],
 }
 
+var helper_upgrade_dict:Dictionary = {
+	"↑ Control Rods Speed": [
+		faster_control_rods,
+		"Rare easy-mode helper: control rods move faster"
+	],
+	"↑ Activity Error Margin": [
+		larger_neutron_margin,
+		"Rare easy-mode helper: gives more room around the activity goal"
+	],
+	"↓ Activity Goal": [
+		lower_neutron_goal,
+		"Rare easy-mode helper: lowers the target reactor activity"
+	],
+}
+
+var helper_upgrade_dict_rbmk:Dictionary = {
+	"↓ Xenon chance": [
+		lower_xenon_chance,
+		"Rare easy-mode helper: lowers the chance that waste becomes xenon"
+	],
+	"↑ Water flow": [
+		water_flow_increase,
+		"Rare easy-mode helper: water cools faster"
+	],
+	"↓ Water absorb chance": [
+		water_absorb_chance_decrease,
+		"Rare easy-mode helper: water absorbs fewer neutrons"
+	],
+}
+
 var upgrade_dict_rbmk:Dictionary = {
 	"↑ Xenon chance": [
 		higher_xenon_chance,
@@ -354,16 +451,65 @@ var upgrade_dict_rbmk:Dictionary = {
 	],
 }
 
+func _reactor_uses_water() -> bool:
+	if map_loaded != null and map_loaded.has_method("uses_water_on_expansion"):
+		return bool(map_loaded.call("uses_water_on_expansion"))
+	return Atom.enable_moderation
+
+func _reactor_uses_moderator_rods() -> bool:
+	if map_loaded != null and map_loaded.has_method("uses_moderator_rods_on_expansion"):
+		return bool(map_loaded.call("uses_moderator_rods_on_expansion"))
+	return Atom.enable_moderation
+
+func _reactor_control_rod_spacer() -> int:
+	if map_loaded != null and map_loaded.has_method("get_expansion_control_rod_spacer"):
+		return int(map_loaded.call("get_expansion_control_rod_spacer"))
+	return 4 if Atom.enable_moderation else 3
+
+func _remove_water_upgrade_choices(upgrades: Dictionary) -> void:
+	upgrades.erase("↓ Water flow")
+	upgrades.erase("↑ Water absorb chance")
+	upgrades.erase("↑ Water flow")
+	upgrades.erase("↓ Water absorb chance")
+
+func _build_available_upgrades(include_helpers: bool) -> Dictionary:
+	var available_upgrades: Dictionary = upgrade_dict.duplicate()
+	if Atom.enable_moderation:
+		available_upgrades.merge(upgrade_dict_rbmk)
+	if include_helpers:
+		available_upgrades.merge(helper_upgrade_dict)
+		if Atom.enable_moderation:
+			available_upgrades.merge(helper_upgrade_dict_rbmk)
+	if not _reactor_uses_water():
+		_remove_water_upgrade_choices(available_upgrades)
+	return available_upgrades
+
 func _on_upgrade_timer_timeout() -> void:
 	'''
 	generates 3 random upgrades and calls the pop up to ask whcih one user want
 	'''
 	
 	game_paused = true
-	var keys:Array = upgrade_dict.keys()
+	var available_upgrades: Dictionary = _build_available_upgrades(false)
+	var keys:Array = available_upgrades.keys()
 	keys.shuffle()
-	var random_keys:Array = keys.slice(0, 3) 
-	$pauseMenu.upgrade_game_mode(random_keys, upgrade_dict)
+	var random_keys:Array = keys.slice(0, 2)
+
+	var helper_chance: float = clampf((1.0 - difficulty_modifier) * 0.5, 0.0, 0.25)
+	if randf() < helper_chance:
+		var helper_upgrades: Dictionary = helper_upgrade_dict.duplicate()
+		if Atom.enable_moderation:
+			helper_upgrades.merge(helper_upgrade_dict_rbmk)
+		if not _reactor_uses_water():
+			_remove_water_upgrade_choices(helper_upgrades)
+		var helper_keys: Array = helper_upgrades.keys()
+		if not helper_keys.is_empty():
+			helper_keys.shuffle()
+			var helper_key: String = str(helper_keys[0])
+			available_upgrades.merge(helper_upgrades)
+			random_keys[randi() % random_keys.size()] = helper_key
+
+	$pauseMenu.upgrade_game_mode(random_keys, available_upgrades)
 	
 
 func call_upgrade(key:String) -> void:
@@ -371,45 +517,30 @@ func call_upgrade(key:String) -> void:
 	thhis function is called from the pop up, it will call the function to activate the user choice
 	'''
 	
-	# if mdoeration is enable the game mode is rbmk. rethink this code
-	if Atom.enable_moderation:
-		upgrade_dict.merge(upgrade_dict_rbmk)
-	upgrade_dict[key][0].call()
+	var available_upgrades: Dictionary = _build_available_upgrades(true)
+	available_upgrades[key][0].call()
 	var add_x:int = 0
 	var add_y:int = 0
 	if float(x_row_build) / (y_row_build) > 1.6: # add only either row or colm
 		add_y += 1
 	else:
 		add_x += 1
-	# messy code. if atom enable moderation then its a rbmk reator. This function should be rethinked
-	if Atom.enable_moderation:
-			build_grid_and_center(
-				x_row_build + add_x,
-				y_row_build + add_y,
-				true,
-				true,
-				true,
-				false,
-				4,
-				true,
-				true,
-				false,
-				true
-			)
-	else:
-		build_grid_and_center(
-				x_row_build + add_x,
-				y_row_build + add_y,
-				true,
-				true,
-				true,
-				false,
-				3,
-				false,
-				false,
-				false,
-				true
-			)
+	var expansion_add_water: bool = _reactor_uses_water()
+	var expansion_add_moderator: bool = _reactor_uses_moderator_rods()
+	var expansion_ctlrod_spacer: int = _reactor_control_rod_spacer()
+	build_grid_and_center(
+		x_row_build + add_x,
+		y_row_build + add_y,
+		true,
+		true,
+		true,
+		false,
+		expansion_ctlrod_spacer,
+		expansion_add_moderator,
+		expansion_add_water,
+		false,
+		true
+	)
 
 func make_bigger_reactor() -> void:
 	'''
@@ -442,14 +573,20 @@ func make_bigger_reactor() -> void:
 	center_cam_atoms()
 
 
+func get_scaled_multiplier(base_multiplier: float) -> float:
+	return maxf(0.05, 1.0 + ((base_multiplier - 1.0) * difficulty_modifier))
+
+func get_scaled_amount(base_amount: int) -> int:
+	return maxi(1, int(round(base_amount * difficulty_modifier)))
+
 func higher_enrichment_percent() -> void:
-	Atom.enrich_percent *= 0.75
+	Atom.enrich_percent *= get_scaled_multiplier(0.75)
 	
 func higher_enrichment_chance() -> void:
-	Atom.instant_enrich_chance *= 1.3
+	Atom.instant_enrich_chance *= get_scaled_multiplier(1.3)
 	
 func faster_delaed_neutrons() -> void: 
-	Atom.spont_emis_time *= 0.75 
+	Atom.spont_emis_time *= get_scaled_multiplier(0.75)
 	if Atom.enable_sponteniues_neutrons:
 		var atoms: Array[Node] = get_tree().get_nodes_in_group("atoms")
 		for atom in atoms:
@@ -457,29 +594,47 @@ func faster_delaed_neutrons() -> void:
 				atom.start_spont_neutron_emission()
 
 func slower_moving_control_rods() -> void:
-	ControlRod.speed *= 0.75
+	ControlRod.speed *= get_scaled_multiplier(0.75)
 	
 func smaller_neutron_margin() -> void:
-	self.margin_error -= 10
+	self.margin_error -= get_scaled_amount(10)
 	
 
 func higher_xenon_chance() -> void:
-	Atom.become_xenon_later_chance *= 1.5
+	Atom.become_xenon_later_chance *= get_scaled_multiplier(1.5)
 	
 func water_flow_decrease() -> void:
-	Water.cool_of_speed *= 0.5
+	Water.cool_of_speed *= get_scaled_multiplier(0.5)
 	
 func water_absorb_chance() -> void:
-	Water.water_absorb_chance *= 1.3
+	Water.water_absorb_chance *= get_scaled_multiplier(1.3)
 	
 	
 func faster_uranium_enrichment() -> void:
-	Atom.enrich_speed *= 0.5
+	Atom.enrich_speed *= get_scaled_multiplier(0.5)
 	$enrich_timer.wait_time = Atom.enrich_speed
 
 	
 func higher_neutron_goal() -> void:
-	self.goal += 50
+	self.goal += get_scaled_amount(50)
+
+func faster_control_rods() -> void:
+	ControlRod.speed *= 1.25
+
+func larger_neutron_margin() -> void:
+	self.margin_error += 15
+
+func lower_neutron_goal() -> void:
+	self.goal = maxi(50, self.goal - 50)
+
+func lower_xenon_chance() -> void:
+	Atom.become_xenon_later_chance *= 0.75
+
+func water_flow_increase() -> void:
+	Water.cool_of_speed *= 1.25
+
+func water_absorb_chance_decrease() -> void:
+	Water.water_absorb_chance *= 0.75
 
 func _on_check_box_enrich_2_toggled(toggled_on: bool) -> void:
 	ControlRod.enable_auomatic = toggled_on
