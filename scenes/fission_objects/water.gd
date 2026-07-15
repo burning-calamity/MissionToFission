@@ -54,6 +54,10 @@ func _process(_delta:float) -> void:
 	# 	linear_velocity += Vector2(0, - self.temp/1000)
 
 
+func set_temperature(new_temp: float) -> void:
+	self.temp = clampf(new_temp, 0, 100000000)
+	queue_redraw_if_temperature_bucket_changed()
+
 func queue_redraw_if_temperature_bucket_changed() -> void:
 	var draw_temp_bucket: int = int(clampf(self.temp, 0, 100))
 	if draw_temp_bucket != last_draw_temp_bucket:
@@ -62,8 +66,7 @@ func queue_redraw_if_temperature_bucket_changed() -> void:
 
 func on_entered_area(body: Node2D) -> void:
 	if body is Neutron:
-		self.temp += 5
-		queue_redraw_if_temperature_bucket_changed()
+		set_temperature(self.temp + 5)
 		if self.temp < 100:
 			if randf() < water_absorb_chance:
 				body.kill_self_deflate()

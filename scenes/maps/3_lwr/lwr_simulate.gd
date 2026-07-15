@@ -63,7 +63,7 @@ func resize_chamber_to_reactor() -> void:
 	_set_half_circle("HalfCircleWall", grid_width, chamber_half_height, false)
 	_set_half_circle("HalfCircleWalInner", grid_width, chamber_half_height, true)
 	$Turbine.position = Vector2(grid_width + 329.0, chamber_half_height + chamber_margin - 9.0)
-	$Area2D-heat-exhanger/CollisionShape2D.position = $Turbine.position - Vector2(21.0, 12.0)
+	get_node("Area2D-heat-exhanger/CollisionShape2D").position = $Turbine.position - Vector2(21.0, 12.0)
 
 	_add_container_wall(Vector2(0, chamber_half_height + chamber_margin), chamber_half_height, 10, 90)
 	_add_container_wall(Vector2(grid_width, chamber_half_height + chamber_margin - 5), chamber_half_height, 10, -90)
@@ -86,7 +86,7 @@ func _add_container_wall(pos: Vector2, height_to_set: float, width_to_set: float
 func _on_area_2_dheatexhanger_body_entered(body: Node2D) -> void:
 	if body is RigidBody2D and body is Water:
 		turbine_speed += body.temp
-		body.temp = 0
+		body.set_temperature(0)
 		
 func _process(delta: float) -> void:
 	$Turbine.rotation_degrees =  fmod($Turbine.rotation_degrees + turbine_speed * delta, 360.0) 
